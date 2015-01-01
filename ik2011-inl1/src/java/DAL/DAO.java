@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package model;
+package DAL;
 
 import java.io.Serializable;
 
@@ -11,6 +11,6 @@ import java.io.Serializable;
  *
  * @author Toppe
  */
-public class Serie implements Serializable{
+public class DAO implements Serializable{
     
 }

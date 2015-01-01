@@ -16,5 +16,8 @@ import javax.faces.bean.SessionScoped;
 @ManagedBean(name = "userBean")
 @SessionScoped
 public class UserBean implements Serializable{
+    private int userId;
+    private String username;
+    
     
 }
