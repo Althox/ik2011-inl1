@@ -5,6 +5,7 @@
  */
 package model;
 
+import java.util.Date;
 import java.util.ArrayList;
 
 /**
@@ -15,6 +16,8 @@ public class League {
     private int id;
     private String name;
     private ArrayList<Team> teams;
+    private ArrayList<Match> matches;
+    private Date startDate;
     
     public League() {
         teams = new ArrayList();
@@ -51,5 +54,21 @@ public class League {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public ArrayList<Match> getMatches() {
+        return matches;
+    }
+
+    public void setMatches(ArrayList<Match> matches) {
+        this.matches = matches;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
     }
 }

@@ -9,14 +9,14 @@ package model;
  *
  * @author Jeff
  */
-public class Team {
+public class UserRole {
+    private static final int LEAGUE_ADMINISTRATOR = 1;
+    private static final int CLUB_ADMINISTRATOR = 2;
+    
     private int id;
     private String name;
-    
-    public Team() {}
-    
-    public Team(String name) {
-        this.name = name;
+
+    public UserRole() {
     }
     
     public int getId() {

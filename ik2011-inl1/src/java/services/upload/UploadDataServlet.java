@@ -3,20 +3,24 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package services;
+package services.upload;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.Date;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import model.League;
-import model.Team;
+import model.LeagueStructure;
+import model.Match;
 
 /**
  *
@@ -50,7 +54,6 @@ public class UploadDataServlet extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -76,22 +79,46 @@ public class UploadDataServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+        response.setContentType("text/plain;charset=UTF-8");
         String leaguesJson = request.getParameter("leagues");
+        String username = request.getParameter("username");
+        String pass = request.getParameter("pass");
+        
         try {
             PrintWriter out = response.getWriter();
-
+            
             if (leaguesJson != null && !leaguesJson.isEmpty()) {
-                Gson gson = new Gson();
-                Type collectionType = new TypeToken<ArrayList<League>>(){}.getType();
-                ArrayList<League> leagues = gson.fromJson(leaguesJson, collectionType);
-                
-                for (League l : leagues) {
-                    out.println(l.getName());
-                    for (Team team : l.getTeams()) {
-                        out.println(team.getName());
+                try {
+                    Gson gson = new Gson();
+                    Type collectionType = new TypeToken<ArrayList<League>>(){}.getType();
+                    ArrayList<League> leagues = gson.fromJson(leaguesJson, collectionType);
+                    
+                    for (League l : leagues) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.set(Calendar.WEEK_OF_YEAR, 43);
+                        cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+                        cal.set(Calendar.HOUR_OF_DAY, 19);
+                        cal.set(Calendar.MINUTE, 00);
+                        l.setStartDate(cal.getTime());
+                        l.setMatches(MatchupGenerator.generateSeasonMatchups(l, LeagueStructure.ROUND_ROBIN));
+                        
+                        out.println("<h2>"+l.getName()+"</h2>");
+                        out.println("<table>");
+                        for (int i = 0; i < l.getMatches().size(); i++) {
+                            DateFormat format = DateFormat.getInstance();
+                            String date = format.format(l.getMatches().get(i).getDate());
+                            out.println("<tr>");
+                            out.println("<td>"+(i+1)+"</td><td>"+date+"</td><td>"+l.getMatches().get(i).getHome().getName()+"</td><td>vs</td><td>"+l.getMatches().get(i).getAway().getName()+"</td>");
+                            out.println("</tr>");
+                        }
+                        out.println("</table>");
                     }
-                    out.println();
+                } catch (Exception e) {
+                    //out.print("-1");
+                    out.println(e.getMessage()+":  <br />");
+                    for (StackTraceElement ste : e.getStackTrace()) {
+                        out.println(ste.getLineNumber()+": "+ste.getFileName()+" "+ste.getMethodName()+"<br />");
+                    }
                 }
             } else {
                 out.print("-1");
@@ -109,6 +136,6 @@ public class UploadDataServlet extends HttpServlet {
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }
