@@ -13,4 +13,7 @@ import java.io.Serializable;
  */
 public class Match implements Serializable{
     
+    private int id;
+    private String name;
+    
 }
