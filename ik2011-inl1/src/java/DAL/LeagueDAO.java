@@ -22,7 +22,7 @@ public class LeagueDAO extends DAO {
     private final String TABLE_NAME = "league";
     
     private final String ID_COLUMN = "league_id";
-    private final String NAME_COLUMN = "name";
+    private final String NAME_COLUMN = "name";    
     
     private LeagueDAO() throws SQLException {
         super();
