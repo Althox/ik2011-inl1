@@ -58,7 +58,7 @@ public class UserDAO implements Serializable {
     private Team getAssociatedTeam(int teamId) {
         Team team = new Team();
         try {
-            PreparedStatement stmt = con.prepareCall(" SELECT * FROM team WHERE team_id = ?");
+            PreparedStatement stmt = con.prepareStatement(" SELECT * FROM team WHERE team_id = ?; ");
             stmt.setInt(1, teamId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -75,7 +75,7 @@ public class UserDAO implements Serializable {
         UserRole role = new UserRole();
 
         try {
-            PreparedStatement stmt = con.prepareCall(" SELECT * FROM user_role WHERE role_id = ?");
+            PreparedStatement stmt = con.prepareStatement(" SELECT * FROM user_role WHERE role_id = ?");
             stmt.setInt(1, roleId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {

@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import model.Match;
 import model.Team;
+import model.League;
 
 /**
  *
@@ -46,4 +47,21 @@ public class TeamDAO {
         
         return matches;
     }
+    
+    public ArrayList<League> getTeamsForLeague(Team team) throws SQLException{
+        CallableStatement stmt = con.prepareCall("{ call p_get_leagues_for_team(?) }");
+        stmt.setInt(1, team.getId());
+        ResultSet rs = stmt.executeQuery();
+        
+        ArrayList<League> list = new ArrayList<>();
+        while(rs.next()){
+            League l = new League();
+            l.setId(rs.getInt("league_id"));
+            l.setName(rs.getString("name"));
+            l.setSeason(rs.getString("year"));
+            list.add(l);
+        }
+        return list;
+    }
+    
 }
