@@ -8,8 +8,6 @@ package DAL;
 import Util.Hasher;
 import java.io.Serializable;
 import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,9 +17,9 @@ import model.User;
  *
  * @author Toppe
  */
-public class UserDAO extends DAO implements Serializable {
+public class UserDAO extends DAOUtil implements Serializable {
 
-    public UserDAO() throws SQLException {
+    /*public UserDAO() throws SQLException {
     }
     
     public User login(String username, String password) throws SQLException {
@@ -37,5 +35,5 @@ public class UserDAO extends DAO implements Serializable {
         CallableStatement stmt = con.prepareCall("{ call p_create_user('" +username+ ", "+password+"') }");
         stmt.executeQuery();
         ResultSet rs = stmt.getResultSet();
-    }
+    }*/
 }

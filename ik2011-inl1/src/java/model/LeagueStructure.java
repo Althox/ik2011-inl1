@@ -10,14 +10,20 @@ package model;
  * @author Jeff
  */
 public enum LeagueStructure {
-    ROUND_ROBIN(1),
-    DOUBLE_ROUND_ROBIN(2);
+    ROUND_ROBIN(1, 14),
+    DOUBLE_ROUND_ROBIN(2, 7);
     private final int value;
-    private LeagueStructure(int value) {
+    private final int daysBetweenMatches;
+    private LeagueStructure(int value, int daysBetweenMatches) {
         this.value = value;
+        this.daysBetweenMatches = daysBetweenMatches;
     }
     
     public int getValue() {
         return value;
+    }
+
+    public int getDaysBetweenMatches() {
+        return daysBetweenMatches;
     }
 }

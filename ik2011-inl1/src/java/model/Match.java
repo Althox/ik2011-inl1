@@ -16,13 +16,13 @@ public class Match implements Serializable{
     private int id;
     private Team home;
     private Team away;
-    private int homeScore;
-    private int awayScore;
+    private int homeScore = -1;
+    private int awayScore = -1;
     private Date date;
 
     public Match() {
     }
-
+    
     public int getId() {
         return id;
     }

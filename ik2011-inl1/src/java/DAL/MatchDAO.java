@@ -11,7 +11,7 @@ import java.sql.SQLException;
  *
  * @author Jeff
  */
-public class MatchDAO extends DAO {
+public class MatchDAO extends DAOUtil {
 
     public MatchDAO() throws SQLException {
     }

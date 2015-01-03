@@ -5,15 +5,16 @@
  */
 package services.upload;
 
+import DAL.LeagueDAO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
-import java.sql.Date;
 import java.text.DateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -21,6 +22,7 @@ import javax.servlet.http.HttpServletResponse;
 import model.League;
 import model.LeagueStructure;
 import model.Match;
+import model.Team;
 
 /**
  *
@@ -83,6 +85,7 @@ public class UploadDataServlet extends HttpServlet {
         String leaguesJson = request.getParameter("leagues");
         String username = request.getParameter("username");
         String pass = request.getParameter("pass");
+        String season = request.getParameter("season");
         
         try {
             PrintWriter out = response.getWriter();
@@ -94,25 +97,44 @@ public class UploadDataServlet extends HttpServlet {
                     ArrayList<League> leagues = gson.fromJson(leaguesJson, collectionType);
                     
                     for (League l : leagues) {
-                        Calendar cal = Calendar.getInstance();
-                        cal.set(Calendar.WEEK_OF_YEAR, 43);
-                        cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
-                        cal.set(Calendar.HOUR_OF_DAY, 19);
-                        cal.set(Calendar.MINUTE, 00);
-                        l.setStartDate(cal.getTime());
+                        l.setSeason(String.valueOf(Integer.parseInt(season))); // Kollar så att det är ett giltigt år.
                         l.setMatches(MatchupGenerator.generateSeasonMatchups(l, LeagueStructure.ROUND_ROBIN));
+                    }
+                    
+                    LeagueDAO dao = LeagueDAO.getInstance();
+                    leagues = dao.uploadLeagueData(leagues);
+                    
+                    for (League l : leagues) {
+                        ArrayList<Match> matches = dao.getMatchesForLeague(l);
+                        Iterator<Match> it = matches.iterator();
+                        Date today = new Date();
+                        while (it.hasNext()) {
+                            Match match = it.next();
+                            if (match.getDate().before(today))
+                                MatchupGenerator.generateRandomScores(match);
+                            else
+                                it.remove(); // Vi vill inte ha match-resultat för matcher som inte har passerat
+                        }
                         
-                        out.println("<h2>"+l.getName()+"</h2>");
+                        dao.uploadMatchResults(matches);
+                    }
+                    
+                    for (League l : leagues) {
+                        out.println("<h2>"+l.getName()+" ("+l.getId()+")</h2>");
                         out.println("<table>");
                         for (int i = 0; i < l.getMatches().size(); i++) {
                             DateFormat format = DateFormat.getInstance();
                             String date = format.format(l.getMatches().get(i).getDate());
                             out.println("<tr>");
-                            out.println("<td>"+(i+1)+"</td><td>"+date+"</td><td>"+l.getMatches().get(i).getHome().getName()+"</td><td>vs</td><td>"+l.getMatches().get(i).getAway().getName()+"</td>");
+                            Team home = l.getMatches().get(i).getHome();
+                            Team away = l.getMatches().get(i).getAway();
+                            out.println("<td>"+(i+1)+"</td><td>"+date+"</td><td>"+home.getName()+" ("+home.getId()+")</td><td>vs</td><td>"+away.getName()+" ("+away.getId()+")</td>");
                             out.println("</tr>");
                         }
                         out.println("</table>");
                     }
+                } catch (NumberFormatException nfe) {
+                    out.print("Ogiltigt år valt!");
                 } catch (Exception e) {
                     //out.print("-1");
                     out.println(e.getMessage()+":  <br />");
@@ -120,6 +142,7 @@ public class UploadDataServlet extends HttpServlet {
                         out.println(ste.getLineNumber()+": "+ste.getFileName()+" "+ste.getMethodName()+"<br />");
                     }
                 }
+                
             } else {
                 out.print("-1");
             }

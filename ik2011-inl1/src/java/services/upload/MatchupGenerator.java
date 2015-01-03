@@ -5,6 +5,8 @@
  */
 package services.upload;
 
+import Util.Numbers;
+import static Util.Numbers.getRandomInt;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -22,6 +24,7 @@ import model.Team;
  * @author Jeff
  */
 public abstract class MatchupGenerator {
+    
     public static ArrayList<Match> generateSeasonMatchups(League league, LeagueStructure structure) {
         ArrayList<Match> matches = new ArrayList();
         ArrayList<Team> teams = league.getTeams();
@@ -61,7 +64,8 @@ public abstract class MatchupGenerator {
                 }
             }
         }
-        matches = generateMatchupDates(matches, teams.size(), league.getStartDate());
+        generateMatchupDates(matches, teams.size(), Integer.parseInt(league.getSeason()), structure);
+        
         return matches;
     }
     
@@ -75,24 +79,20 @@ public abstract class MatchupGenerator {
 
     private static boolean containsMatchup(ArrayList<Match> matches, Match matchToTest, LeagueStructure structure) {
         
-        if (structure == LeagueStructure.DOUBLE_ROUND_ROBIN) {
-            for (Match match : matches) {
-                if (match.equalsIgnoreReversed(matchToTest)) {
+        for (Match match : matches) {
+            if (structure == LeagueStructure.DOUBLE_ROUND_ROBIN) {
+                if (match.equalsIgnoreReversed(matchToTest))
                     return true;
-                }
-            }
-        } else {
-            for (Match match : matches) {
-                if (match.equals(matchToTest)) {
+            } else {
+                if (match.equals(matchToTest))
                     return true;
-                }
             }
         }
 
         return false;
     }
     
-    private static ArrayList<Match> generateMatchupDates(ArrayList<Match> matches, int numOfTeams, Date startDate) {
+    private static void generateMatchupDates(ArrayList<Match> matches, int numOfTeams, int seasonYear, LeagueStructure leagueStructure) {
         
         int matchesPerRound, numOfRounds;
         
@@ -107,7 +107,7 @@ public abstract class MatchupGenerator {
         
         ArrayList<Round> rounds = new ArrayList();
         
-        Date currentDate = startDate;
+        Date currentDate = getLeagueStartDate(seasonYear);
         
         while (!matches.isEmpty()) {
             Round round = new Round(matchesPerRound);
@@ -127,14 +127,25 @@ public abstract class MatchupGenerator {
             }
             round.setDate(currentDate);
             rounds.add(round);
-            currentDate = addDaysToDate(currentDate, 14);
+            
+            currentDate = addDaysToDate(currentDate, leagueStructure.getDaysBetweenMatches());
         }
         
         for (Round round : rounds) {
             matches.addAll(round.getMatches());
         }
-        
-        return matches;
+    }
+    
+    private static Date getLeagueStartDate(int year) {
+        Calendar cal = Calendar.getInstance();
+        cal.clear();
+        cal.set(Calendar.YEAR, year);
+        cal.set(Calendar.WEEK_OF_YEAR, 43);
+        cal.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY);
+        cal.set(Calendar.HOUR_OF_DAY, Numbers.getRandomInt(15, 19));
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        return cal.getTime();
     }
     
     private static ArrayList<Match> getMatches(ArrayList<Match> matches, Team team) {
@@ -153,8 +164,17 @@ public abstract class MatchupGenerator {
         GregorianCalendar calendar = new GregorianCalendar();
         calendar.setTime(newDate);
         calendar.add(Calendar.DATE, noOfDays);
+        calendar.set(Calendar.HOUR_OF_DAY, Numbers.getRandomInt(15, 19));
         newDate.setTime(calendar.getTime().getTime());
 
         return newDate;
+    }
+    
+    public static void generateRandomScores(Match match) {
+        int scoreHome = getRandomInt(0, 9);
+        int scoreAway = getRandomInt(0, 9);
+        
+        match.setHomeScore(scoreHome);
+        match.setAwayScore(scoreAway);
     }
 }
