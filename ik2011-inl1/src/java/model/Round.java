@@ -60,4 +60,8 @@ public class Round {
             super(message);
         }
     }
+
+    public int getTotalMatchups() {
+        return totalMatchups;
+    }
 }

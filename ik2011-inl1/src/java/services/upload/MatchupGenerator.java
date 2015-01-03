@@ -76,7 +76,7 @@ public abstract class MatchupGenerator {
         match.setAway(away);
         return match;
     }
-
+    
     private static boolean containsMatchup(ArrayList<Match> matches, Match matchToTest, LeagueStructure structure) {
         
         for (Match match : matches) {
@@ -92,6 +92,19 @@ public abstract class MatchupGenerator {
         return false;
     }
     
+    /**
+     * Genererar speldatum för alla matcher.
+     * 
+     * Notera att tiden mellan varje runda bestäms av vilken turneringsstruktur som används.
+     * Används LeagueStructure.ROUND_ROBIN kommer speltiderna spridas ut över längre perioder, två veckor mellan varje runda
+     * 
+     * Används LeaguseStructure.DOUBLE_ROUND_ROBIN kommer speltiderna att spridas ut lite mer tätt inpå, 1 vecka mellan varje runda.
+     * 
+     * @param matches
+     * @param numOfTeams
+     * @param seasonYear
+     * @param leagueStructure 
+     */
     private static void generateMatchupDates(ArrayList<Match> matches, int numOfTeams, int seasonYear, LeagueStructure leagueStructure) {
         
         int matchesPerRound, numOfRounds;
@@ -104,19 +117,19 @@ public abstract class MatchupGenerator {
         }
         
         matchesPerRound = matches.size() / numOfRounds;
-        
         ArrayList<Round> rounds = new ArrayList();
-        
         Date currentDate = getLeagueStartDate(seasonYear);
         
+        // När en match tilldelats en runda kommer matchen att tas bort, därmed kommer loopen sluta när alla matcher tilldelats en runda.
         while (!matches.isEmpty()) {
             Round round = new Round(matchesPerRound);
             
+            // Vi kan inte manipulera listor i en for-each loop, därför använder vi en iterator och tillhörande while-loop istället.
             Iterator<Match> it = matches.iterator();
             while (it.hasNext()) {
                 Match match = it.next();
                 
-                if (!round.containsTeam(match.getAway()) || !round.containsTeam(match.getHome())) {
+                if ((!round.containsTeam(match.getAway()) && !round.containsTeam(match.getHome())) && !inPreviousRounds(rounds, match)) {
                     try {
                         round.addMatch(match);
                         it.remove();
@@ -134,6 +147,36 @@ public abstract class MatchupGenerator {
         for (Round round : rounds) {
             matches.addAll(round.getMatches());
         }
+    }
+    
+    /**
+     * Kollar om ett lag redan spelat en match i en föregående runda.
+     *
+     * -1 eller -2 rundor tillbaka kommer kollas, baserat på följande regler:
+     * 
+     * > I turneringar med ett jämt antal lag kommet lag att få finnas varannan runda.
+     * > I turneringar med ett ojämnt antal lag kommer ett lag att få finnas en gång var tredje runda.
+     * 
+     * @param rounds
+     * @param match
+     * @return 
+     */
+    private static boolean inPreviousRounds(ArrayList<Round> rounds, Match match) {
+        if (rounds.size() < 2) // Ingen poäng att kolla om storleken är 0 eller 1, vi vet att ingen tidigare runda finns i båda fallen.
+            return false;
+        
+        // Kollar föregående runda.
+        boolean found = rounds.get(rounds.size()-1).containsTeam(match.getAway()) &&  rounds.get(rounds.size() -1).containsTeam(match.getHome());
+        
+        
+        if (!found && rounds.size() > 1) {
+            // I turneringar med jämnt antal lag får varje lag spela minst en match varannan runda.
+            // I turneringar med ojämnt antal lag får varje lag spela minst en match var tredje runda.
+            if (rounds.get(0).getTotalMatchups() % 2 != 0)
+                found = rounds.get(rounds.size()-2).containsTeam(match.getAway()) && rounds.get(rounds.size() -2).containsTeam(match.getHome());
+        }
+        
+        return found;
     }
     
     private static Date getLeagueStartDate(int year) {

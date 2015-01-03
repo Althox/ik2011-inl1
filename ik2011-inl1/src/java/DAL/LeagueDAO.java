@@ -124,6 +124,10 @@ public class LeagueDAO {
         
         return matches;
     }
+    
+    public ArrayList<Match> getMatchesForTeam(Team team) throws SQLException {
+        return null;
+    }
 
     public ArrayList<League> uploadLeagueData(ArrayList<League> leagues) throws SQLException, LeagueExistsException {
         
@@ -146,19 +150,26 @@ public class LeagueDAO {
             stmt.close();
         
         } catch (SQLException sqle) {
-            PreparedStatement stmnt = con.prepareStatement("TRUNCATE TABLE ?");
-            stmnt.setString(1, "league");
-            stmnt.addBatch();
-            stmnt.setString(1, "team");
-            stmnt.addBatch();
-            stmnt.setString(1, "league_teams");
-            stmnt.addBatch();
-            stmnt.setString(1, "ik2011_bandy.match");
-            stmnt.addBatch();
-            stmnt.setString(1, "match_result");
-            stmnt.addBatch();
-            stmnt.executeBatch();
+            PreparedStatement stmnt = con.prepareStatement("TRUNCATE TABLE league");
+            stmnt.executeUpdate();
             stmnt.close();
+            
+            stmnt = con.prepareStatement("TRUNCATE TABLE team");
+            stmnt.executeUpdate();
+            stmnt.close();
+            
+            stmnt = con.prepareStatement("TRUNCATE TABLE league_teams");
+            stmnt.executeUpdate();
+            stmnt.close();
+            
+            stmnt = con.prepareStatement("TRUNCATE TABLE ik2011_bandy.match");
+            stmnt.executeUpdate();
+            stmnt.close();
+            
+            stmnt = con.prepareStatement("TRUNCATE TABLE match_result");
+            stmnt.executeUpdate();
+            stmnt.close();
+            
             uploadLeague(league);
         }
     }
