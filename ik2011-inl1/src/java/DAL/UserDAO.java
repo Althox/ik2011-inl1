@@ -8,10 +8,10 @@ package DAL;
 import Util.Hasher;
 import java.io.Serializable;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import model.Team;
 import model.User;
 import model.UserRole;
@@ -20,10 +20,24 @@ import model.UserRole;
  *
  * @author Toppe
  */
-public class UserDAO extends DAOUtil implements Serializable {
-
-    /*public UserDAO() throws SQLException {
+public class UserDAO implements Serializable {
+    private Connection con;
+    private static UserDAO instance;
+    
+    public UserDAO() throws SQLException {
+        this.con = DAOUtil.connect();
     }
+    
+    
+    public static synchronized UserDAO getInstance() throws SQLException {
+
+        if (instance == null) {
+            instance = new UserDAO();
+        }
+
+        return instance;
+    }
+    
     
     public User login(String username, String password) throws SQLException {
         CallableStatement stmt = con.prepareCall("{ call p_login('"+username+"', '"+password+"') }");
@@ -94,5 +108,5 @@ public class UserDAO extends DAOUtil implements Serializable {
         CallableStatement stmt = con.prepareCall("{ call p_create_user('" +username+ ", "+password+"') }");
         stmt.executeQuery();
         ResultSet rs = stmt.getResultSet();
-    }*/
+    }
 }
