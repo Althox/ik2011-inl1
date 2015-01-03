@@ -43,13 +43,15 @@ public class LeagueDAO {
         return instance;
     }
     
+    
+    
     public League getLeagueBasicInfoById(int leagueId ) throws SQLException {
         PreparedStatement stmnt = con.prepareStatement("SELECT * FROM league WHERE league_id = ?");
         stmnt.setInt(1, leagueId);
         ResultSet rs = stmnt.getResultSet();
         League league;
         if (rs.first())
-            league = parseBasicLeagueInformation(rs);
+            league = DAOUtil.parseBasicLeagueInformation(rs, this);
         else
             throw new SQLException("Empty result for league_id: "+leagueId);
         
@@ -64,7 +66,7 @@ public class LeagueDAO {
         ArrayList<League> leagues = new ArrayList();
 
         while (results.next()) {
-            leagues.add(parseBasicLeagueInformation(results));
+            leagues.add(DAOUtil.parseBasicLeagueInformation(results, this));
         }
 
         return leagues;
@@ -79,7 +81,6 @@ public class LeagueDAO {
      */
     public League getCompleteLeagueData(int leagueId) throws SQLException {
         League league = getLeagueBasicInfoById(leagueId);
-        
         league.setTeams(getTeamsForLeague(league));
         league.setMatches(getMatchesForLeague(league));
         
@@ -103,7 +104,7 @@ public class LeagueDAO {
         ArrayList<Team> teams = new ArrayList();
 
         while (results.next()) {
-            teams.add(parseTeamInformation(results));
+            teams.add(DAOUtil.parseTeamInformation(results));
         }
         
         return teams;
@@ -119,7 +120,7 @@ public class LeagueDAO {
         ArrayList<Match> matches = new ArrayList();
         
         while (results.next()) {
-            matches.add(parseMatchInformation(results));
+            matches.add(DAOUtil.parseMatchInformation(results));
         }
         
         return matches;
@@ -260,38 +261,7 @@ public class LeagueDAO {
             stmt.setInt(3, match.getAwayScore());
             stmt.addBatch();
         }
-    }
-
-    private League parseBasicLeagueInformation(ResultSet set) throws SQLException {
-        League l = new League();
-        
-        l.setId(set.getInt(ID_COLUMN));
-        l.setName(set.getString(NAME_COLUMN));
-        
-        return l;
-    }
-    
-    private Team parseTeamInformation(ResultSet set) throws SQLException {
-        Team team = new Team();
-        
-        team.setId(set.getInt("team_id"));
-        team.setId(set.getInt("name"));
-        
-        return team;
-    }
-
-    private Match parseMatchInformation(ResultSet set) throws SQLException {
-        Match match = new Match();
-        
-        match.setId(set.getInt("match_id"));
-        match.setHome(new Team(set.getInt("home_id"), set.getString("home_name")));
-        match.setAway(new Team(set.getInt("away_id"), set.getString("away_name")));
-        match.setHomeScore(set.getInt("home_score"));
-        match.setAwayScore(set.getInt("away_score"));
-        match.setDate(set.getTimestamp("date"));
-        return match;
-    }
-    
+    }    
     public class LeagueExistsException extends Exception {
 
         public LeagueExistsException(String message) {

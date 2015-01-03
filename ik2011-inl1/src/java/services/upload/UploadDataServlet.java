@@ -90,6 +90,12 @@ public class UploadDataServlet extends HttpServlet {
         try {
             PrintWriter out = response.getWriter();
             
+            /*
+            *
+            * OBS KOLLA OM USERNAME OCH LÖSENORD STÄMMER OCH OM USERNAME HAR EN ROLL SOM TILLÅTS GÖRA DETTA (League Administrator)!
+            *
+            */
+            
             if (leaguesJson != null && !leaguesJson.isEmpty()) {
                 try {
                     Gson gson = new Gson();

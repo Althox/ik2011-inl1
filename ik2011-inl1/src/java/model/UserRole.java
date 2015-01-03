@@ -5,11 +5,13 @@
  */
 package model;
 
+import java.io.Serializable;
+
 /**
  *
  * @author Jeff
  */
-public class UserRole {
+public class UserRole implements Serializable {
     private static final int LEAGUE_ADMINISTRATOR = 1;
     private static final int CLUB_ADMINISTRATOR = 2;
     

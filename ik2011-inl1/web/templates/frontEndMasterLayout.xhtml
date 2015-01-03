@@ -1,0 +1,76 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <h:head>
+        <title>LigaSystem</title>
+        <h:outputStylesheet name="main.css" library="css"/>
+    </h:head>
+    <h:body>
+        <b:navBar brand="LigaSystem" brandHref="./" inverse="true" static="true">
+            <b:navbarLinks pull="right">
+                <h:form styleClass="navbar-form navbar-right" rendered="#{not userBean.loggedIn}">
+                    <div class="form-group">
+                        <b:inputText value="#{user.username}" placeholder="Användarnamn" fieldSize="sm"/>
+                    </div>
+                    <div class="form-group">
+                        <b:inputText value="#{user.password}" placeholder="Lösenord" fieldSize="sm"/>
+                    </div>
+                    <b:commandButton value="Logga in" look="primary"  size="sm" action="#{userBean.login(user)}"/>
+                </h:form>
+                <b:navLink value="Inloggad som: #{user.username}" rendered="#{userBean.loggedIn}" href="#" />
+                <b:dropMenu value="Mina Sidor" rendered="#{userBean.loggedIn}">
+                    <b:navLink value="Administrera Lag" href="#" />
+                    <b:navLink value="Ändra lösenord" href="#" />
+                    <b:navLink value="Logga ut" href="#{userBean.logout(user)}" />
+                </b:dropMenu>
+            </b:navbarLinks>
+        </b:navBar>
+        <b:container>
+            <b:row>
+                <div id="main_banner_container">
+                    <h:graphicImage id="main_banner" url="/images/main_banner.jpg" alt="Välkommen!" />
+                </div>
+            </b:row>
+            <b:row>
+                <ui:insert name="content" />
+            </b:row>
+        </b:container>
+
+        <!-- MODALS FOR LOGIN -->
+        <b:modal id="loginModal" title="Logga In">
+            <p>Skriv in användarnamn och lösenord för att logga in.</p>
+            <h:form id="loginform">
+                <b:column col-md="6" col-sm="12">
+                    <h:outputText value="Användarnamn:"/>
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <b:inputText value="" placeholder="Användarnamn"/>
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <h:outputText value="Lösenord:"/>
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <b:inputText value="" placeholder="Lösenord" />
+                </b:column>
+                <f:facet name="footer">
+                    <b:commandButton value="Logga In" id="btnLogin" look="primary" action="#{userBean.login}" />
+                    <b:button value="Avbryt" look="danger" dismiss="modal" onclick="return false;"/>
+                </f:facet>
+            </h:form>
+        </b:modal>
+
+        <b:modal id="successModal" title="Lyckad Inloggning!">
+            <p>Du har nu loggats in!</p>
+            <f:facet name="footer">
+                <b:button value="Ok" look="success" dismiss="modal" onclick="return false;"/>
+            </f:facet>
+        </b:modal>
+        <!-- END OF MODAL -->
+
+    </h:body>
+</html>
+
