@@ -38,16 +38,21 @@ public class UserDAO implements Serializable {
         return instance;
     }
 
-    public int login(String username, String password) throws SQLException {
+    public boolean login(User user) throws SQLException {
         CallableStatement stmt = con.prepareCall("{ call p_login(?,?) }");
-        stmt.setString(1, username);
-        stmt.setString(2, password);
+        stmt.setString(1, user.getUsername());
+        stmt.setString(2, user.getPassword());
         ResultSet rs = stmt.executeQuery();
         
-        if (rs.next())
-            return rs.getInt("user_id");
+        if (rs.next()) {
+            user.setId(rs.getInt("user_id"));
+            user.setRole(getRole(rs.getInt("role_id")));
+            user.setAssociatedTeam(getAssociatedTeam(rs.getInt("team_id")));
+            user.setPassword(null); // Vill inte lagra lösenord i sessioner.
+            return true;
+        }
         
-        return -1;
+        return false;
     }
 
     private Team getAssociatedTeam(int teamId) {

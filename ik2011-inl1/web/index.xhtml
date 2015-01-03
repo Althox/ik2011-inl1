@@ -12,12 +12,10 @@
             <ui:define name="content">
                 <b:row>
                     <b:column col-md="4" col-sm="12">
-                        <!-- här genereras match data -->
                         <b:panel title="Serier">
                             <h:outputText value="#{userBean} AND #{user}" />
                             <br />
                             <h:outputText value="#{userBean.isLoggedIn()}" />
-                            <!-- tabell data från matcher -->
                             <h:dataTable value="#{leagueBean}" var="series" class="table table-striped">
                                 <h:column>
                                     <f:facet name="header">Serie</f:facet>
@@ -31,12 +29,10 @@
                         </b:panel>
                     </b:column>
                     <b:column col-md="8" col-sm="12">
-                        <!-- Här genereras serie data -->
                         <b:panel title="Matcher">
                             <b:navBar inverse="false">
                                 <b:navbarLinks>
                                     <b:dropMenu value="Välj Serie">
-                                        <!-- loopar ut serier -->
                                         <form id="serieform">
                                             <h:dataTable value="#{leagueBean}" var="games">
                                                 <b:navLink>
@@ -48,7 +44,6 @@
                                     </b:dropMenu>
                                 </b:navbarLinks>
                             </b:navBar>
-                            <!-- tabell data från serier -->
                             <form id="matchResultForm">
                                 <h:dataTable value="#{leagueBean}" var="results" class="table table-striped">
                                     <h:column>

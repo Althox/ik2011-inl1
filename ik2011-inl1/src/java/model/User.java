@@ -6,14 +6,14 @@
 package model;
 
 import java.io.Serializable;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 
 /**
  *
  * @author Jeff
  */
-@ManagedBean(name = "user")
+@Named("user")
 @SessionScoped
 public class User implements Serializable{
     private int id;

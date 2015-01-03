@@ -10,39 +10,31 @@ import Util.SessionUtil;
 import model.User;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Date;
 import javax.faces.application.FacesMessage;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.RequestScoped;
-import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
+import javax.inject.Named;
 import javax.servlet.http.HttpSession;
+import javax.enterprise.context.SessionScoped;
 
 /**
  *
  * @author Toppe
  */
-@ManagedBean(name = "userBean")
-@RequestScoped
+@Named("userBean")
+@SessionScoped
 public class UserBean implements Serializable {
-
+    private boolean loggedIn = false;
     public UserBean() {
     }
 
-    public void login(User inUser) throws Exception {
-        System.out.println(inUser.getUsername());
-        System.out.println(inUser.getPassword());
+    public String login(User user) throws Exception {
+        System.out.println(user.getUsername());
+        System.out.println(user.getPassword());
         try {
             UserDAO dao = UserDAO.getInstance();
-            int userId = dao.login(inUser.getUsername(), inUser.getPassword());
-            System.out.println("Got userId: "+userId);
-            if (userId != -1) {
-                // get Http Session and store username
-                HttpSession session = SessionUtil.getSession();
-                session.setAttribute("user_id", userId);
-
+            if (dao.login(user)) {
+                loggedIn = true;
             } else {
-
                 FacesContext.getCurrentInstance().addMessage(
                         null,
                         new FacesMessage(FacesMessage.SEVERITY_WARN,
@@ -56,20 +48,20 @@ public class UserBean implements Serializable {
                 System.out.println(el.getLineNumber() + ": " + el.getFileName());
             }
         } catch (Exception e) {
-            throw new Exception(e.getMessage());
+            return "";
         }
+        return "";
     }
 
     public String logout(User inUser) {
-        HttpSession session = SessionUtil.getSession();
-        session.invalidate();
-        return "index";
+        HttpSession sesson = SessionUtil.getSession();
+        sesson.invalidate();
+        inUser = null;
+        loggedIn = false;
+        return "";
     }
     
     public boolean isLoggedIn() {
-        HttpSession session = SessionUtil.getSession();
-        boolean b = session.getAttribute("user_id") != null;
-        System.out.println(new Date()+" isLoggedIn result: "+b+" Session info: id="+session.getId()+" lastAccess="+session.getLastAccessedTime());
-        return b;
+        return this.loggedIn;
     }
 }
