@@ -3,14 +3,123 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:b="http://bootsfaces.net/ui"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://xmlns.jcp.org/jsf/passthrough">
     <h:head>
         <title>LigaSystem</title>
+        <h:outputScript name="jquery-2.1.3.min.js" library="js" />
     </h:head>
     <h:body>
+        <b:navBar brand="LigaSystem" brandHref="./" inverse="true" static="true">
+            <b:navbarLinks>
+                <b:navLink value="Hem" href="./"></b:navLink>
+            </b:navbarLinks>
+            <b:navbarLinks pull="right">
+                <b:button value="Redigera Användare" rendered="#{not userBean.loggedIn}"/>
+                <b:button value="Logga Ut" rendered="#{not userBean.loggedIn}"/>
+                <b:button value="Logga In" p:data-target="#loginModal" p:data-toggle="modal" onclick="return false;" rendered="#{userBean.loggedIn}"/>
+            </b:navbarLinks>
+        </b:navBar>
         <b:container>
-            Inledande URL mönstret sätts till http://host:port/liganamn/startyear/
+            <b:row>
+                <b:column col-md="4" col-sm="12">
+                    <!-- här genereras match data -->
+                    <b:panel title="Serier">
+                        <!-- tabell data från matcher -->
+                        <h:dataTable value="#{leagueBean}" var="series" class="table table-striped">
+                            <h:column>
+                                <f:facet name="header">Serie</f:facet>
+                                <h:outputText value="#{series}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Pågick</f:facet>
+                                <h:outputText value="#{series}"/>
+                            </h:column>
+                        </h:dataTable>
+                    </b:panel>
+                </b:column>
+                <b:column col-md="8" col-sm="12">
+                    <!-- Här genereras serie data -->
+                    <b:panel title="Matcher">
+                        <b:navBar inverse="false">
+                            <b:navbarLinks>
+                                    <b:dropMenu value="Välj Serie">
+                                        <!-- loopar ut serier -->
+                                        <form id="serieform">
+                                            <h:dataTable value="#{leagueBean}" var="games">
+                                                <b:navLink>
+                                                    <f:ajax render="@form" execute="@form"></f:ajax> 
+                                                    <h:commandButton value="#{games}" />
+                                                </b:navLink>
+                                            </h:dataTable>
+                                        </form>
+                                    </b:dropMenu>
+                            </b:navbarLinks>
+                        </b:navBar>
+                        <!-- tabell data från serier -->
+                        <form id="matchResultForm">
+                            <h:dataTable value="#{leagueBean}" var="results" class="table table-striped">
+                                <h:column>
+                                    <f:facet name="header">Datum</f:facet>
+                                    <h:outputText value="#{results}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">ID</f:facet>
+                                    <h:outputText value="#{results}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">Hemma</f:facet>
+                                    <h:outputText value="#{results}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">Borta</f:facet>
+                                    <h:outputText value="#{results}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">Resultat</f:facet>
+                                    <h:outputText value="#{results}"/>
+                                </h:column>
+                            </h:dataTable>
+                        </form>
+                    </b:panel>
+                </b:column>
+            </b:row>
         </b:container>
+        
+        <!-- MODALS FOR LOGIN -->
+        <b:modal id="loginModal" title="Logga In">
+            <p>Skriv in användarnamn och lösenord för att logga in.</p>
+            <h:form id="loginform">
+                <b:column col-md="6" col-sm="12">
+                    <h:outputText value="Användarnamn:"/>
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <h:inputText value="username" />
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <h:outputText value="Lösenord:"/>
+                </b:column>
+                <b:column col-md="6" col-sm="12">
+                    <h:inputText value="password" />
+                </b:column>
+                <b:commandButton value="Logga In" id="btnLogin" look="primary" ajax="true" action="#{userBean.login}">
+                    <f:ajax render="successModal" execute="@form" />
+                </b:commandButton>
+            </h:form>
+            <br/>
+                <f:facet name="footer">
+                    <b:button value="Avbryt" look="danger" dismiss="modal" onclick="return false;"/>
+                </f:facet>
+            </b:modal>
+        
+        <b:modal id="successModal" title="Lyckad Inloggning!">
+            <p>Du har nu loggats in!</p>
+            <f:facet name="footer">
+                <b:button value="Ok" look="success" dismiss="modal" onclick="return false;"/>
+            </f:facet>
+        </b:modal>
+        <!-- END OF MODAL -->
     </h:body>
 </html>
+
 
