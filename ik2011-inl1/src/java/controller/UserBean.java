@@ -13,7 +13,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 import javax.enterprise.context.SessionScoped;
 import messages.Message;
-import util.Sessions;
+import utils.Sessions;
 
 /**
  *
