@@ -5,8 +5,7 @@
  */
 package services.upload;
 
-import Util.Numbers;
-import static Util.Numbers.getRandomInt;
+import util.Numbers;
 import java.util.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -18,6 +17,7 @@ import model.LeagueStructure;
 import model.Match;
 import model.Round;
 import model.Team;
+import static util.Numbers.getRandomInt;
 
 /**
  *

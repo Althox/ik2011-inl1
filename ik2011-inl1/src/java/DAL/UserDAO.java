@@ -5,7 +5,6 @@
  */
 package DAL;
 
-import Util.Hasher;
 import java.io.Serializable;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -99,7 +98,7 @@ public class UserDAO implements Serializable {
 
         return role;
     }
-
+    /*
     public void createUser(String username, String password) throws SQLException {
 
         password = Hasher.createHash(password);
@@ -107,5 +106,5 @@ public class UserDAO implements Serializable {
         CallableStatement stmt = con.prepareCall("{ call p_create_user('" + username + ", " + password + "') }");
         stmt.executeQuery();
         ResultSet rs = stmt.getResultSet();
-    }
+    }*/
 }

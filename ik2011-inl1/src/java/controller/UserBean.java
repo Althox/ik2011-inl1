@@ -6,7 +6,6 @@
 package controller;
 
 import DAL.UserDAO;
-import Util.SessionUtil;
 import model.User;
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -14,6 +13,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 import javax.enterprise.context.SessionScoped;
 import messages.Message;
+import util.Sessions;
 
 /**
  *
@@ -51,7 +51,7 @@ public class UserBean implements Serializable {
     }
 
     public String logout(User inUser) {
-        HttpSession sesson = SessionUtil.getSession();
+        HttpSession sesson = Sessions.getSession();
         sesson.invalidate();
         inUser = null;
         loggedIn = false;
