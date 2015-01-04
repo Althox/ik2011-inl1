@@ -59,7 +59,12 @@
                                         </h:outputText>
                                     </h:column>
                                     <h:column>
-                                        <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#"  value="Rapportera resultat" look="success" size="xs" />
+                                        <!-- <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#{adminBean.isUpdatePressed(matches, matches.id)}"  value="Rapportera resultat" look="primary" size="xs" />-->
+                                        <h:form id="updateScoreForm" rendered="#{adminBean.isUpdatePressed(matches, matches.id)}">
+                                            <b:inputText placeholder="Hemma poäng" span="7" id="homeScore" value="#{matches.homeScore}" />
+                                            <b:inputText placeholder="Borta poäng" span="7" id="awayScore" value="#{matches.awayScore}" />
+                                            <h:commandButton action="#{adminBean.reportScores(matches, matches.homeScore, matches.awayScore)}" class="btn btn-success btn-xs" value="Uppdatera" />
+                                        </h:form>
                                     </h:column>
                                 </h:dataTable>
                             </h:form>

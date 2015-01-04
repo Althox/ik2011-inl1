@@ -31,6 +31,11 @@ public class AdminBean implements Serializable {
     public AdminBean() {
 
     }
+    
+    public boolean isUpdatePressed(Match match, int matchId){
+        Date today = new Date();
+        return match.getDate().before(today) && match.getAwayScore() == -1 && match.getHomeScore() == -1 && match.getId() == matchId;
+    }
 
     public ArrayList<Match> getMatchesForTeam(Team team) {
         ArrayList<Match> list = new ArrayList<>();
