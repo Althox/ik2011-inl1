@@ -18,13 +18,15 @@ public enum Message {
 
     SUCCESS_PASSWORD_CHANGED("passwordChangeSuccessful", FacesMessage.SEVERITY_INFO),
     SUCCESS_LOGGED_OUT("loggedOut", FacesMessage.SEVERITY_INFO),
+    SUCCESS_RESULTS_REPORTED("resultsReported", FacesMessage.SEVERITY_INFO),
     ERROR_LOGIN_FAILED("loginFailed", FacesMessage.SEVERITY_WARN),
     ERROR_REQUIRED("required", FacesMessage.SEVERITY_ERROR),
     ERROR_ALL_REQUIRED("allFieldsRequired", FacesMessage.SEVERITY_ERROR),
     ERROR_UNKNOWN("unknownError", FacesMessage.SEVERITY_FATAL),
     ERROR_PASSWORD_MISMATCH("passwordMismatch", FacesMessage.SEVERITY_ERROR),
     ERROR_PASSWORD_INCORRECT("passwordIncorrect", FacesMessage.SEVERITY_ERROR),
-    ERROR_NO_DATA_FOUND("noDataFound", FacesMessage.SEVERITY_FATAL);
+    ERROR_NO_DATA_FOUND("noDataFound", FacesMessage.SEVERITY_FATAL),
+    ERROR_NOT_A_NUMBER("notANumber", FacesMessage.SEVERITY_ERROR);
 
     private final String key;
     private final Severity severity;
@@ -41,7 +43,7 @@ public enum Message {
         return this.severity;
     }
     
-    public static void addMessageToContext(Message message) {
+    public static void outputMessage(Message message) {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundle = context.getApplication().getResourceBundle(context, "messages");
         String returnMessage = bundle.getString(message.getKey());

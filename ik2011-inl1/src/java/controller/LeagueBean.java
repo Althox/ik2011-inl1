@@ -10,6 +10,9 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.Iterator;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import messages.Message;
@@ -40,7 +43,7 @@ public class LeagueBean implements Serializable {
     }
 
     public League getSelectedLeague() {
-        for (League l :leagues) {
+        for (League l : leagues) {
             if (l.getId() == selectedLeague) {
                 return l;
             }
@@ -59,49 +62,21 @@ public class LeagueBean implements Serializable {
 
                 if (lgs.isEmpty()) {
                     leagues = null;
-                    Message.addMessageToContext(Message.ERROR_NO_DATA_FOUND);
+                    Message.outputMessage(Message.ERROR_NO_DATA_FOUND);
                 } else {
                     selectedLeague = lgs.get(0).getId();
                 }
                 leagues = lgs;
                 return leagues;
             } catch (SQLException sqle) {
-                Message.addMessageToContext(Message.ERROR_UNKNOWN);
+                Message.outputMessage(Message.ERROR_UNKNOWN);
                 return null;
             }
         } else {
             return leagues;
         }
     }
-    
-    private String currRowStyling = "";
-    
-    public String getRowStylings() {
-        return currRowStyling;
-    }
-    
-    /**
-     * Genererar olika style-klasser för alla rader i datatabellen.
-     * 
-     * @param standings 
-     */
-    private void generateRowStyling(ArrayList<Standing> standings) {
-        StringBuilder build = new StringBuilder();
-        for (int i = 0; i < standings.size(); i++) {
-            if (i == 0 || i == 1)
-                build.append("standings_advance_class");
-            else if (i == standings.size()-1)
-                build.append("standings_regress_class");
-            else
-                build.append("standings_unscathed_class");
-            
-            if (i != standings.size()-1)
-                build.append(",");
-        }
-        
-        currRowStyling = build.toString();
-    }
-    
+
     public ArrayList<Standing> getStandings() {
 
         if (selectedLeague == -1) {
@@ -114,20 +89,66 @@ public class LeagueBean implements Serializable {
             dao.connect();
             ArrayList<Match> matches = dao.getMatchesForLeague(selectedLeague);
             dao.disconnect();
-            
+
             ArrayList<Standing> standings = generateStandings(matches);
-            
+            this.upcomingMatches = generateUpcomingMatches(matches, 5);
+
             generateRowStyling(standings);
             return standings;
         } catch (Exception sqle) {
-            /*Message.addMessageToContext("Feltyp " + sqle.getClass() + " - " + sqle.getMessage());
+            Message.addMessageToContext("Feltyp " + sqle.getClass() + " - " + sqle.getMessage());
             for (StackTraceElement ste : sqle.getStackTrace()) {
                 Message.addMessageToContext(ste.getLineNumber() + " -> " + ste.getFileName());
-            }*/
+            }
 
         }
-        Message.addMessageToContext(Message.ERROR_NO_DATA_FOUND);
+        Message.outputMessage(Message.ERROR_NO_DATA_FOUND);
         return null;
+    }
+
+    private ArrayList<Match> upcomingMatches;
+
+    public ArrayList<Match> getUpcomingMatches() {
+        return this.upcomingMatches;
+    }
+
+    public ArrayList<Match> generateUpcomingMatches(ArrayList<Match> matches, int amount) {
+
+        ArrayList<Match> temp = new ArrayList(matches);
+
+        // Tar bort matcher med passerade datum
+        Date today = new Date();
+        Iterator<Match> it = temp.iterator();
+        while (it.hasNext()) {
+            Match match = it.next();
+            if (match.getDate().before(today)) {
+                it.remove();
+            }
+        }
+
+        int i = temp.size() - 1;
+        while (temp.size() > amount) {
+            temp.remove(i);
+            i--;
+        }
+
+        Collections.sort(temp, new Comparator<Match>() {
+
+            @Override
+            public int compare(Match mOne, Match mTwo) {
+                if (mTwo.getDate().before(mOne.getDate())) {
+                    return 1;
+                }
+                if (mTwo.getDate().after(mOne.getDate())) {
+                    return -1;
+                }
+
+                return 0;
+            }
+
+        });
+
+        return temp;
     }
 
     public ArrayList<Standing> generateStandings(ArrayList<Match> matches) {
@@ -137,7 +158,7 @@ public class LeagueBean implements Serializable {
             if (match.getAwayScore() == -1 || match.getHomeScore() == -1) {
                 continue;
             }
-            
+
             prepareStanding(standings, match.getHome(), match.getHomeScore(), match.getAwayScore());
             prepareStanding(standings, match.getAway(), match.getAwayScore(), match.getHomeScore());
 
@@ -203,9 +224,10 @@ public class LeagueBean implements Serializable {
      * @return indexet om funnen, -1 om laget ej påfanns
      */
     private int getIndexOfTeam(ArrayList<Standing> standings, Team team) {
-        if (standings.isEmpty())
+        if (standings.isEmpty()) {
             return -1;
-        
+        }
+
         for (int i = 0; i < standings.size(); i++) {
             if (team.getId() == standings.get(i).getTeam().getId()) {
                 return i;
@@ -213,4 +235,35 @@ public class LeagueBean implements Serializable {
         }
         return -1;
     }
+
+    private String currRowStyling = "";
+
+    public String getRowStylings() {
+        return currRowStyling;
+    }
+
+    /**
+     * Genererar olika style-klasser för alla rader i datatabellen.
+     *
+     * @param standings
+     */
+    private void generateRowStyling(ArrayList<Standing> standings) {
+        StringBuilder build = new StringBuilder();
+        for (int i = 0; i < standings.size(); i++) {
+            if (i == 0 || i == 1) {
+                build.append("standings_advance_class");
+            } else if (i == standings.size() - 1) {
+                build.append("standings_regress_class");
+            } else {
+                build.append("standings_unscathed_class");
+            }
+
+            if (i != standings.size() - 1) {
+                build.append(",");
+            }
+        }
+
+        currRowStyling = build.toString();
+    }
+
 }

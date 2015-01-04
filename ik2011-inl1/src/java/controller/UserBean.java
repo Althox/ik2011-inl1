@@ -34,10 +34,10 @@ public class UserBean implements Serializable {
             if (dao.login(user)) {
                 loggedIn = true;
             } else {
-                Message.addMessageToContext(Message.ERROR_LOGIN_FAILED);
+                Message.outputMessage(Message.ERROR_LOGIN_FAILED);
             }
         } catch (SQLException e) {
-            Message.addMessageToContext(Message.ERROR_UNKNOWN);
+            Message.outputMessage(Message.ERROR_UNKNOWN);
             System.out.println(e.getClass() + " " + e.getMessage());
 
             for (StackTraceElement el : e.getStackTrace()) {
@@ -56,7 +56,7 @@ public class UserBean implements Serializable {
         inUser = null;
         loggedIn = false;
         
-        Message.addMessageToContext(Message.SUCCESS_LOGGED_OUT);
+        Message.outputMessage(Message.SUCCESS_LOGGED_OUT);
         return "";
     }
     
@@ -67,24 +67,24 @@ public class UserBean implements Serializable {
     public String changePassword(User user, String oldPass, String newPass, String newPassMatch) {
         
         if (oldPass.isEmpty() || newPass.isEmpty() || newPassMatch.isEmpty()) {
-            Message.addMessageToContext(Message.ERROR_ALL_REQUIRED);
+            Message.outputMessage(Message.ERROR_ALL_REQUIRED);
         }
         
         if (newPass.equals(newPassMatch)) {
             try {
                 UserDAO dao = UserDAO.getInstance();
                 if(dao.changePassword(user, oldPass, newPass)) {
-                    Message.addMessageToContext(Message.SUCCESS_PASSWORD_CHANGED);
+                    Message.outputMessage(Message.SUCCESS_PASSWORD_CHANGED);
                     return "";
                 }
                 else
-                    Message.addMessageToContext(Message.ERROR_PASSWORD_INCORRECT);
+                    Message.outputMessage(Message.ERROR_PASSWORD_INCORRECT);
             } catch(SQLException sqle) {
-                Message.addMessageToContext(Message.ERROR_UNKNOWN);
+                Message.outputMessage(Message.ERROR_UNKNOWN);
                 return "";
             }
         } else {
-            Message.addMessageToContext(Message.ERROR_PASSWORD_MISMATCH);
+            Message.outputMessage(Message.ERROR_PASSWORD_MISMATCH);
         }
         
         return "";

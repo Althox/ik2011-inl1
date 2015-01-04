@@ -218,7 +218,16 @@ public class LeagueDAO {
         matchesStatement.executeBatch();
         matchesStatement.close();
     }
-
+    
+    public void uploadMatchResult(Match match) throws SQLException {
+        PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
+        stmnt.setInt(1, match.getId());
+        stmnt.setInt(2, match.getHomeScore());
+        stmnt.setInt(2, match.getAwayScore());
+        stmnt.executeUpdate();
+        stmnt.close();
+    }
+    
     public void uploadMatchResults(ArrayList<Match> matches) throws SQLException {
         PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
         prepareMatchResults(stmnt, matches);
