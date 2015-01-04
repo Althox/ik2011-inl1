@@ -121,7 +121,7 @@ public abstract class MatchupGenerator {
         
         matchesPerRound = matches.size() / numOfRounds;
         ArrayList<Round> rounds = new ArrayList();
-        
+        Collections.shuffle(matches);
         // När en match tilldelats en runda kommer matchen att tas bort, därmed kommer loopen sluta när alla matcher tilldelats en runda.
         while (!matches.isEmpty()) {
             Round round = new Round(matchesPerRound);
@@ -144,21 +144,22 @@ public abstract class MatchupGenerator {
         }
         
         // Försöker minimera risken att ett lag får spela oftare än andra i början av säsongen.
-        Collections.sort(rounds, new Comparator<Round>() {
+        /*Collections.sort(rounds, new Comparator<Round>() {
             @Override
             public int compare(Round one, Round two) {
                 if (two.containsAnyTeam(one))
-                    return -1;
+                    return 1;
                 else
                     return 0;
             }
-        });
+        });*/
+        
+        Collections.shuffle(rounds);
         
         Date currentDate = getLeagueStartDate(seasonYear);
         for (Round round : rounds) {
             round.setDate(currentDate);
             matches.addAll(round.getMatches());
-            
             currentDate = addDaysToDate(currentDate, leagueStructure.getDaysBetweenMatches());
         }
     }

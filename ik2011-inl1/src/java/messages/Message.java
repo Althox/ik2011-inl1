@@ -26,10 +26,12 @@ public enum Message {
     ERROR_PASSWORD_MISMATCH("passwordMismatch", FacesMessage.SEVERITY_ERROR),
     ERROR_PASSWORD_INCORRECT("passwordIncorrect", FacesMessage.SEVERITY_ERROR),
     ERROR_NO_DATA_FOUND("noDataFound", FacesMessage.SEVERITY_FATAL),
-    ERROR_NOT_A_NUMBER("notANumber", FacesMessage.SEVERITY_ERROR);
+    ERROR_NOT_A_NUMBER("notANumber", FacesMessage.SEVERITY_ERROR),
+    ERROR_UNAUTHORIZED("unauthorized", FacesMessage.SEVERITY_ERROR);
 
     private final String key;
     private final Severity severity;
+
     private Message(String key, Severity severity) {
         this.key = key;
         this.severity = severity;
@@ -38,21 +40,26 @@ public enum Message {
     public String getKey() {
         return this.key;
     }
-    
+
     public Severity getSeverity() {
         return this.severity;
     }
-    
+
+    public String getMessage() {
+        FacesContext context = FacesContext.getCurrentInstance();
+        ResourceBundle bundle = context.getApplication().getResourceBundle(context, "messages");
+        return bundle.getString(this.getKey());
+    }
+
     public static void outputMessage(Message message) {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundle = context.getApplication().getResourceBundle(context, "messages");
         String returnMessage = bundle.getString(message.getKey());
         Message.outputMessage(returnMessage);
     }
-    
+
     public static void outputMessage(String message) {
         FacesContext context = FacesContext.getCurrentInstance();
         context.addMessage("displayAtTop", new FacesMessage(message));
     }
 }
-

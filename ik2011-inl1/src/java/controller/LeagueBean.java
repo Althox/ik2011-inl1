@@ -154,20 +154,27 @@ public class LeagueBean implements Serializable {
     public ArrayList<Standing> generateStandings(ArrayList<Match> matches) {
         ArrayList<Standing> standings = new ArrayList();
         for (Match match : matches) {
-            // We can get no information from matches that haven't been played yet.s
-            if (match.getAwayScore() == -1 || match.getHomeScore() == -1) {
-                continue;
-            }
-
             prepareStanding(standings, match.getHome(), match.getHomeScore(), match.getAwayScore());
             prepareStanding(standings, match.getAway(), match.getAwayScore(), match.getHomeScore());
-
         }
 
         // Sorterar baserat på vem som vunnit mest.
-        Collections.sort(standings, (Standing stOne, Standing stTwo) -> stTwo.getTotalPoints() - stOne.getTotalPoints());
+        Collections.sort(standings, new Comparator<Standing>() {
+
+            public int compare(Standing stOne, Standing stTwo) {
+                int res = stTwo.getTotalPoints() - stOne.getTotalPoints();
+                if (res == 0) {
+                    res = (stTwo.getGoalsFor() - stTwo.getGoalsAgainst()) - (stOne.getGoalsFor() - stOne.getGoalsAgainst());
+                    if (res == 0) {
+                        res = stTwo.getGoalsFor() - stOne.getGoalsFor();
+                    }
+                }
+                return res;
+            }
+        });
+        
         for (int i = 0; i < standings.size(); i++) {
-            standings.get(i).setPosition(i + 1);
+            standings.get(i).setPosition(i + 1); // TODO: Arbitrary placement. Needs to make some other checks, for example if tied with another team, the one with bigges "MS" would get a higher position.
         }
         return standings;
     }
@@ -190,6 +197,11 @@ public class LeagueBean implements Serializable {
         } else {
             stand = new Standing(team);
             standings.add(stand);
+        }
+        // We can get no result information from matches that haven't been played yet.
+        // We may want to add the teams to a standing though. This is why we don't check until this late.
+        if (goalsFor == -1 || goalsAgainst == -1) {
+            return;
         }
         prepareStandingValues(stand, goalsFor, goalsAgainst);
     }

@@ -78,7 +78,7 @@ and open the template in the editor.
 }
 
 .standings_unscathed_class {
-    
+
 }
 
 #updateScoreForm {
@@ -87,4 +87,31 @@ and open the template in the editor.
 
 #updateScoreForm td {
     padding: 5px;
+}
+
+#footer {
+    margin-top: 40px;
+    width: 100%;
+    display: block;
+    margin-bottom: 0px;
+    position:absolute;
+    bottom:0;
+    left:0;
+}
+
+#footerTop {
+    background: #428BCA;
+    width: 100%;
+    height: 30px;
+}
+
+#footerBottom {
+    background: #1a547a;
+    width: 100%;
+    height: 50px;
+}
+
+.light_text {
+    color: #ccdde9;
+    font-size: 1.2em;
 }

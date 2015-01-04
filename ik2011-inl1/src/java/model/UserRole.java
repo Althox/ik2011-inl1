@@ -12,8 +12,8 @@ import java.io.Serializable;
  * @author Jeff
  */
 public class UserRole implements Serializable {
-    private static final int LEAGUE_ADMINISTRATOR = 1;
-    private static final int CLUB_ADMINISTRATOR = 2;
+    public static final String LEAGUE_ADMINISTRATOR = "League Administrator";
+    public static final String CLUB_ADMINISTRATOR = "Club Administrator";
     
     private int id;
     private String name;

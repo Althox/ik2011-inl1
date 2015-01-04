@@ -14,10 +14,10 @@
                 <b:navbarLinks pull="right">
                     <h:form styleClass="navbar-form navbar-right" rendered="#{not userBean.loggedIn}">
                         <div class="form-group">
-                            <b:inputText value="#{user.username}" placeholder="Användarnamn" fieldSize="sm"/>
+                            <h:inputText value="#{user.username}" pt:placeholder="Användarnamn" class="form-control input-sm" />
                         </div>
                         <div class="form-group">
-                            <h:inputSecret  value="#{user.password}" pt:placeholder="Lösenord" class="form-control input-sm" />
+                            <h:inputSecret value="#{user.password}" pt:placeholder="Lösenord" class="form-control input-sm" />
                         </div>
                         #{" "}
                         <b:commandButton value="Logga in" look="primary"  size="sm" action="#{userBean.login(user)}" ajax="false" />
@@ -33,8 +33,8 @@
                     </h:form>
 
                     <b:dropMenu value="Mina Sidor" rendered="#{userBean.loggedIn}">
-                        <b:navLink value="Administrera Lag" href="./admin.xhtml" rendered="#{not empty user.associatedTeam}" />
-                        <b:navLink value="Ändra lösenord" href="./changepassword.xhtml" />
+                        <b:navLink value="Administrera Lag" href="./User/admin.xhtml" rendered="#{not empty user.associatedTeam}" />
+                        <b:navLink value="Ändra lösenord" href="./User/changepassword.xhtml" />
                     </b:dropMenu>
                 </b:navbarLinks>
             </b:navBar>

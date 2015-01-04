@@ -48,6 +48,7 @@ public class UserDAO implements Serializable {
             user.setRole(getRole(rs.getInt("role_id")));
             user.setAssociatedTeam(getAssociatedTeam(rs.getInt("team_id")));
             user.setPassword(null); // Vill inte lagra lösenord i sessioner.
+            con.close();
             return true;
         }
         con.close();

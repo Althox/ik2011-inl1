@@ -21,10 +21,14 @@ public class User implements Serializable{
     private String password;
     private UserRole role;
     private Team associatedTeam;
-    private boolean loggedIn = false;
 
     public User() {
     }
+    
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    } 
     
     public int getId() {
         return id;
@@ -65,13 +69,4 @@ public class User implements Serializable{
     public void setPassword(String password) {
         this.password = password;
     }
-
-    public void setLoggedIn(boolean loggedIn) {
-        this.loggedIn = loggedIn;
-    }
-
-    public boolean isLoggedIn() {
-        return loggedIn;
-    }
-    
 }

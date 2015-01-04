@@ -6,6 +6,7 @@
 package services.upload;
 
 import DAL.LeagueDAO;
+import DAL.UserDAO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import java.io.IOException;
@@ -15,14 +16,18 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import messages.Message;
 import model.League;
 import model.LeagueStructure;
 import model.Match;
 import model.Team;
+import model.User;
+import model.UserRole;
 
 /**
  *
@@ -47,7 +52,7 @@ public class UploadDataServlet extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet UploadDataServlet</title>");            
+            out.println("<title>Servlet UploadDataServlet</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet UploadDataServlet at " + request.getContextPath() + "</h1>");
@@ -84,54 +89,77 @@ public class UploadDataServlet extends HttpServlet {
         response.setContentType("text/plain;charset=UTF-8");
         String leaguesJson = request.getParameter("leagues");
         String username = request.getParameter("username");
-        String pass = request.getParameter("pass");
+        String pass = request.getParameter("password");
         String season = request.getParameter("season");
-        
+
         try {
             PrintWriter out = response.getWriter();
+            ResourceBundle rb = ResourceBundle.getBundle("messages.messages");
             
-            /*
-            *
-            * OBS KOLLA OM USERNAME OCH LÖSENORD STÄMMER OCH OM USERNAME HAR EN ROLL SOM TILLÅTS GÖRA DETTA (League Administrator)!
-            *
-            */
-            
-            if (leaguesJson != null && !leaguesJson.isEmpty()) {
+            // Kollar autentisering och authorisering
+            boolean allowed = false;
+            try {
+                UserDAO uDao = UserDAO.getInstance();
+                User user = new User(username, pass);
+                if (uDao.login(user)) {
+
+                    if (user.getRole().getName().equals(UserRole.LEAGUE_ADMINISTRATOR)) {
+                        allowed = true;
+                    } else {
+                        out.println(rb.getString(Message.ERROR_UNAUTHORIZED.getKey()));
+                    }
+
+                } else {
+                    out.println(rb.getString(Message.ERROR_LOGIN_FAILED.getKey()));
+                }
+
+            } catch (Exception e) {
+                out.println(rb.getString(Message.ERROR_LOGIN_FAILED.getKey()));
+                return;
+            }
+
+            if (leaguesJson != null && !leaguesJson.isEmpty() && allowed) {
                 try {
                     Gson gson = new Gson();
-                    Type collectionType = new TypeToken<ArrayList<League>>(){}.getType();
+                    Type collectionType = new TypeToken<ArrayList<League>>() {
+                    }.getType();
                     ArrayList<League> leagues = gson.fromJson(leaguesJson, collectionType);
-                    
+
                     for (League l : leagues) {
                         l.setSeason(String.valueOf(Integer.parseInt(season))); // Kollar så att det är ett giltigt år.
                         l.setMatches(MatchupGenerator.generateSeasonMatchups(l, LeagueStructure.ROUND_ROBIN));
                     }
-                    
-                    
+
                     LeagueDAO dao = LeagueDAO.getInstance();
-                    
+
                     dao.connect();
                     leagues = dao.uploadLeagueData(leagues);
-                    
+
                     for (League l : leagues) {
                         ArrayList<Match> matches = dao.getMatchesForLeague(l);
-                        if (matches.isEmpty())
+                        if (matches.isEmpty()) {
                             throw new Exception("Empty matches");
+                        }
                         Iterator<Match> it = matches.iterator();
                         Date today = new Date();
                         while (it.hasNext()) {
                             Match match = it.next();
-                            if (match.getDate().before(today))
+                            if (match.getDate().before(today)) {
                                 MatchupGenerator.generateRandomScores(match);
-                            else
+                            } else {
                                 it.remove(); // Vi vill inte ha match-resultat för matcher som inte har passerat
+                            }
                         }
+                        /*for (int i = matches.size()-1; i > Math.(matches.size() / 3); i--) { // Remove some match-results. so we have something to report.
+                            matches.remove(i);
+                        }*/
                         
                         dao.uploadMatchResults(matches);
                     }
                     dao.disconnect();
+                    out.println("<h1>Uppladdning lyckades! Här följer lite info:</h1>");
                     for (League l : leagues) {
-                        out.println("<h2>"+l.getName()+" ("+l.getId()+")</h2>");
+                        out.println("<h2>" + l.getName() + " (" + l.getId() + ")</h2>");
                         out.println("<table>");
                         for (int i = 0; i < l.getMatches().size(); i++) {
                             DateFormat format = DateFormat.getInstance();
@@ -139,7 +167,7 @@ public class UploadDataServlet extends HttpServlet {
                             out.println("<tr>");
                             Team home = l.getMatches().get(i).getHome();
                             Team away = l.getMatches().get(i).getAway();
-                            out.println("<td>"+(i+1)+"</td><td>"+date+"</td><td>"+home.getName()+" ("+home.getId()+")</td><td>vs</td><td>"+away.getName()+" ("+away.getId()+")</td>");
+                            out.println("<td>" + (i + 1) + "</td><td>" + date + "</td><td>" + home.getName() + " (" + home.getId() + ")</td><td>vs</td><td>" + away.getName() + " (" + away.getId() + ")</td>");
                             out.println("</tr>");
                         }
                         out.println("</table>");
@@ -148,16 +176,13 @@ public class UploadDataServlet extends HttpServlet {
                     out.print("Ogiltigt år valt!");
                 } catch (Exception e) {
                     //out.print("-1");
-                    out.println(e.getMessage()+":  <br />");
+                    out.println(e.getMessage() + ":  <br />");
                     for (StackTraceElement ste : e.getStackTrace()) {
-                        out.println(ste.getLineNumber()+": "+ste.getFileName()+" "+ste.getMethodName()+"<br />");
+                        out.println(ste.getLineNumber() + ": " + ste.getFileName() + " " + ste.getMethodName() + "<br />");
                     }
                 }
-                
-            } else {
-                out.print("-1");
             }
-        } catch(IOException ioe) {
+        } catch (IOException ioe) {
             
         }
     }

@@ -55,9 +55,8 @@ public class UserBean implements Serializable {
         sesson.invalidate();
         inUser = null;
         loggedIn = false;
-        
         Message.outputMessage(Message.SUCCESS_LOGGED_OUT);
-        return "index.html";
+        return "logout";
     }
     
     public boolean isLoggedIn() {
