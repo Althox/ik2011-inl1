@@ -3,7 +3,8 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:b="http://bootsfaces.net/ui">
+      xmlns:b="http://bootsfaces.net/ui"
+      xmlns:pt="http://xmlns.jcp.org/jsf/passthrough">
     <h:head>
         <title>Facelet Title</title>
     </h:head>
@@ -16,8 +17,9 @@
                             <b:inputText value="#{user.username}" placeholder="Användarnamn" fieldSize="sm"/>
                         </div>
                         <div class="form-group">
-                            <b:inputText value="#{user.password}" placeholder="Lösenord" fieldSize="sm"/>
+                            <h:inputSecret  value="#{user.password}" pt:placeholder="Lösenord" class="form-control input-sm" />
                         </div>
+                        #{" "}
                         <b:commandButton value="Logga in" look="primary"  size="sm" action="#{userBean.login(user)}" ajax="false" />
                     </h:form>
                     <b:navLink value="Inloggad som: #{user.username}" rendered="#{userBean.loggedIn}" href="#" />
@@ -27,7 +29,7 @@
                     </h:form>
 
                     <b:dropMenu value="Mina Sidor" rendered="#{userBean.loggedIn}">
-                        <b:navLink value="Administrera Lag" href="./admin.xhtml" />
+                        <b:navLink value="Administrera Lag" href="./admin.xhtml" rendered="#{not empty user.associatedTeam}" />
                         <b:navLink value="Ändra lösenord" href="./changepassword.xhtml" />
                     </b:dropMenu>
                 </b:navbarLinks>

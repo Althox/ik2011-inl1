@@ -5,7 +5,6 @@
  */
 package controller;
 
-import DAL.LeagueDAO;
 import DAL.TeamDAO;
 import model.Match;
 import model.Team;
@@ -13,39 +12,69 @@ import model.League;
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import java.util.Date;
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
+import messages.Message;
 
 /**
  *
  * @author Toppe
  */
-@ManagedBean(name = "adminBean")
+@Named("adminBean")
 @SessionScoped
 public class AdminBean implements Serializable{
-    
+    private int selectedLeagueId = -1;
     public AdminBean(){
         
     }
     
-    public ArrayList<Match> getMatchesForTeam(Team team, League league){
+    public ArrayList<Match> getMatchesForTeam(Team team){
         ArrayList<Match> list = new ArrayList<>();
-        try{
-            list = TeamDAO.getInstance().getMatchesForTeam(team, league.getId());
-        }catch(SQLException e){
-            System.out.println(e.getMessage());
+        
+        if (selectedLeagueId == -1)
+            return list;
+        
+        try {
+            list = TeamDAO.getInstance().getMatchesForTeam(team, selectedLeagueId);
+        } catch(SQLException e) {
+            Message.addMessageToContext(e.getMessage());
         }
         return list;
     }
     
-    public ArrayList<League> getTeamsForLeague(Team team){
+    public ArrayList<League> getLeaguesForTeam(Team team){
         ArrayList<League> list = new ArrayList<>();
         try{
-            list = TeamDAO.getInstance().getTeamsForLeague(team);
+            list = TeamDAO.getInstance().getLeaguesForTeam(team);
         }catch(SQLException e){
-            System.out.println(e.getMessage());
+            Message.addMessageToContext(e.getMessage());
         }
+        if (list.size() == 1)
+            selectedLeagueId = list.get(0).getId();
+        
         return list;
     }
     
+    public boolean isSelectedLeague(int leagueId) {
+        return  selectedLeagueId != -1 && leagueId == selectedLeagueId;
+    }
+    
+    public String selectLeague(int leagueId) {
+        this.selectedLeagueId = leagueId;
+        return "";
+    }
+
+    public int getSelectedLeague() {
+        return selectedLeagueId;
+    }
+    
+    public boolean isMatchReportable(Match match) {
+        Date today = new Date();
+        return match.getDate().before(today) && match.getAwayScore() == -1 && match.getHomeScore() == -1;
+    }
+    
+    public boolean hasSelectedLeague() {
+        return selectedLeagueId != -1;
+    }
 }

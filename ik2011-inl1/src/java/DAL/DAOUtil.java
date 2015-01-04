@@ -39,8 +39,11 @@ public abstract class DAOUtil {
         match.setId(set.getInt("match_id"));
         match.setHome(new Team(set.getInt("home_id"), set.getString("home_name")));
         match.setAway(new Team(set.getInt("away_id"), set.getString("away_name")));
-        match.setHomeScore(set.getInt("home_score"));
-        match.setAwayScore(set.getInt("away_score"));
+        
+        String temp = set.getString("home_score");
+        match.setHomeScore((temp == null) ? -1 : Integer.parseInt(temp));
+        temp = set.getString("away_score");
+        match.setAwayScore((temp == null) ? -1 : Integer.parseInt(temp));
         match.setDate(set.getTimestamp("date"));
         return match;
     }

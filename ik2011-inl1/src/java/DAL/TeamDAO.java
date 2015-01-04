@@ -23,18 +23,19 @@ public class TeamDAO {
     private static TeamDAO instance;
 
     private TeamDAO() throws SQLException {
-        this.con = DAOUtil.connect();
     }
     
     public static synchronized TeamDAO getInstance() throws SQLException {
         if (instance == null) {
             instance = new TeamDAO();
         }
-
+        
         return instance;
     }
     
     public ArrayList<Match> getMatchesForTeam(Team team, int leagueId) throws SQLException {
+        con = DAOUtil.connect();
+        
         CallableStatement stmnt = con.prepareCall("{ call p_get_matches_for_team( ?, ? ) }");
         stmnt.setInt(1, leagueId);
         stmnt.setInt(2, team.getId());
@@ -45,10 +46,13 @@ public class TeamDAO {
             matches.add(DAOUtil.parseMatchInformation(rs));
         }
         
+        con.close();
         return matches;
     }
     
-    public ArrayList<League> getTeamsForLeague(Team team) throws SQLException{
+    public ArrayList<League> getLeaguesForTeam(Team team) throws SQLException{
+        con = DAOUtil.connect();
+        
         CallableStatement stmt = con.prepareCall("{ call p_get_leagues_for_team(?) }");
         stmt.setInt(1, team.getId());
         ResultSet rs = stmt.executeQuery();
@@ -61,7 +65,7 @@ public class TeamDAO {
             l.setSeason(rs.getString("year"));
             list.add(l);
         }
+        con.close();
         return list;
     }
-    
 }

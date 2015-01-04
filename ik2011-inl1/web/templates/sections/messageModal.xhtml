@@ -9,7 +9,7 @@
     </h:head>
     <h:body>
         <ui:composition >
-            <b:alert severity="warning" closable="true" rendered="#{not empty facesContext.getMessageList('displayAtTop')}">
+            <b:alert id="displayAtTopMessage" severity="warning" closable="true" rendered="#{not empty facesContext.getMessageList('displayAtTop')}">
                 <h:messages layout="table" infoClass="infoMessage" warnClass="warnMessage" errorClass="errorMessage" />
             </b:alert>
         </ui:composition>

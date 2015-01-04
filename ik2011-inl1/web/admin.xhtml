@@ -11,61 +11,61 @@
     <h:body>
         <ui:composition template="/templates/adminMasterLayout.xhtml">
             <ui:define name="content">
-                
+                <h1><h:outputText value="Administrera #{user.associatedTeam.name}"/></h1>
                 <b:row>
-                    <h1><h:outputText value="#{user.associatedTeam.name}"/></h1>
-                    <b:column col-md="6" col-sm="12">
-                        <b:panel title="Lägg Till Matchresultat" >
-                            <h:form>
-                                <h:dataTable value="" var="matches" class="table table-striped">
+                    <b:column col-md="3" col-sm="12">
+                        <b:panel title="Ligor">
+                            <h:dataTable value="#{adminBean.getLeaguesForTeam(user.associatedTeam)}" var="leagues" class="table table-striped">
+                                <h:column>
+                                    <h:outputText value="#{leagues.name}"/>
+                                </h:column>
+                                <h:column>
+                                    <h:outputText value="#{leagues.season}"/>
+                                </h:column>
+                                <h:column>
+                                    <h:form>
+                                        <b:commandButton action="#{adminBean.selectLeague(leagues.id)}" value="Visa matcher" look="primary" size="xs" rendered="#{not adminBean.isSelectedLeague(leagues.id)}" />
+                                        <h:outputText class="max_width" value="Visas" rendered="#{adminBean.isSelectedLeague(leagues.id)}" />
+                                    </h:form>
+                                </h:column>
+                            </h:dataTable>
+                        </b:panel>
+                    </b:column>
+                    <b:column col-md="9" col-sm="12">
+                        <b:panel title="Matchresultat">
+                            <b:alert severity="info" rendered="#{adminBean.hasSelectedLeague()}" closable="true" title="Instruktioner: ">#{messages.adminMatchResultInstructions}</b:alert>
+                                
+                            <b:alert severity="danger" rendered="#{not adminBean.hasSelectedLeague()}">#{messages.moreThanOneLeagueInstructions}</b:alert>
+                            <h:form rendered="#{adminBean.hasSelectedLeague()}">
+                                <h:dataTable value="#{adminBean.getMatchesForTeam(user.associatedTeam)}" var="matches" class="table table-striped">
                                     <h:column>
-                                        <f:facet name="header">ID</f:facet>
-                                        <h:outputText value="#{matches.id}" />
+                                        <h:outputText value="#{matches.home.name}" />
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Säsong</f:facet>
-                                        <h:outputText value="#{matches.season}" />
+                                        <h:outputText value="#{matches.homeScore}" rendered="#{matches.homeScore != -1}" />
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Namn</f:facet>
-                                        <h:outputText value="#{matches.name}" />
+                                        <h:outputText value="-" />
                                     </h:column>
                                     <h:column>
-                                        <h:commandLink rendered="" action="#" id="editLink" value="Uppdatera" class="btn btn-primary btn-sm">
-                                            <f:ajax render="@form"/>
-                                        </h:commandLink>
-                                        <h:commandLink rendered="" id="cancelEditLink" value="Avbryt" action="#" class="btn btn-warning btn-sm">
-                                            <f:ajax render="@form" />
-                                        </h:commandLink>
+                                        <h:outputText value="#{matches.awayScore}" rendered="#{matches.homeScore != -1}" />
+                                    </h:column>
+                                    <h:column>
+                                        <h:outputText value="#{matches.away.name}" />
+                                    </h:column>
+                                    <h:column>
+                                        <h:outputText value="#{matches.date}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                                        </h:outputText>
+                                    </h:column>
+                                    <h:column>
+                                        <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#"  value="Rapportera resultat" look="success" size="xs" />
                                     </h:column>
                                 </h:dataTable>
                             </h:form>
                         </b:panel>
                     </b:column>
-                    <b:column col-md="6" col-sm="12">
-                        <b:panel title="Tillhörande Ligor">
-                            <h:dataTable value="#{adminBean.getTeamsForLeague(user.associatedTeam)}" var="leagues" class="table table-striped">
-                                <h:column>
-                                    <f:facet name="header">ID</f:facet>
-                                    <h:outputText value="#{leagues.id}"/>
-                                </h:column>
-                                <h:column>
-                                    <f:facet name="header">Liga</f:facet>
-                                    <h:outputText value="#{leagues.name}"/>
-                                </h:column>
-                                <h:column>
-                                    <f:facet name="header">År</f:facet>
-                                    <h:outputText value="#{leagues.season}"/>
-                                </h:column>
-                            </h:dataTable>
-                        </b:panel>
-                    </b:column>
                 </b:row>
-                
-                <!-- SUCCESS ALERTS -->
-                <b:alert rendered="" severity="success" closable="true"><strong>Uppdaterat!</strong></b:alert>
-                <!-- -->
-                
             </ui:define>
         </ui:composition>
     </h:body>

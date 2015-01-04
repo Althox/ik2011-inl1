@@ -34,10 +34,10 @@ public class UserBean implements Serializable {
             if (dao.login(user)) {
                 loggedIn = true;
             } else {
-                //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Test"));
                 Message.addMessageToContext(Message.ERROR_LOGIN_FAILED);
             }
         } catch (SQLException e) {
+            Message.addMessageToContext(Message.ERROR_UNKNOWN);
             System.out.println(e.getClass() + " " + e.getMessage());
 
             for (StackTraceElement el : e.getStackTrace()) {
@@ -88,5 +88,9 @@ public class UserBean implements Serializable {
         }
         
         return "";
+    }
+    
+    public boolean hasAssociatedTeam(User user) {
+        return user.getAssociatedTeam() != null;
     }
 }
