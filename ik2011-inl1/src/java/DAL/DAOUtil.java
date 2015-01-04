@@ -27,7 +27,7 @@ public abstract class DAOUtil {
         return DriverManager.getConnection(url, username, pass);
     }
 
-    public static League parseBasicLeagueInformation(ResultSet set, LeagueDAO leagueDAO) throws SQLException {
+    public static League parseBasicLeagueInformation(ResultSet set) throws SQLException {
         League l = new League();
         l.setId(set.getInt("league_id"));
         l.setName(set.getString("name"));

@@ -43,15 +43,13 @@ public class LeagueDAO {
         return instance;
     }
     
-    
-    
     public League getLeagueBasicInfoById(int leagueId ) throws SQLException {
         PreparedStatement stmnt = con.prepareStatement("SELECT * FROM league WHERE league_id = ?");
         stmnt.setInt(1, leagueId);
         ResultSet rs = stmnt.getResultSet();
         League league;
         if (rs.first())
-            league = DAOUtil.parseBasicLeagueInformation(rs, this);
+            league = DAOUtil.parseBasicLeagueInformation(rs);
         else
             throw new SQLException("Empty result for league_id: "+leagueId);
         
@@ -66,7 +64,7 @@ public class LeagueDAO {
         ArrayList<League> leagues = new ArrayList();
 
         while (results.next()) {
-            leagues.add(DAOUtil.parseBasicLeagueInformation(results, this));
+            leagues.add(DAOUtil.parseBasicLeagueInformation(results));
         }
 
         return leagues;
@@ -124,10 +122,6 @@ public class LeagueDAO {
         }
         
         return matches;
-    }
-    
-    public ArrayList<Match> getMatchesForTeam(Team team) throws SQLException {
-        return null;
     }
 
     public ArrayList<League> uploadLeagueData(ArrayList<League> leagues) throws SQLException, LeagueExistsException {

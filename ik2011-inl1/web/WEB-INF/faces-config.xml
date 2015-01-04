@@ -17,5 +17,10 @@
         <managed-bean-class>model.User</managed-bean-class>
         <managed-bean-scope>session</managed-bean-scope>
     </managed-bean>-->
-    
+    <application>
+        <resource-bundle>
+            <base-name>messages.messages</base-name>
+            <var>messages</var>
+        </resource-bundle>
+    </application>
 </faces-config>

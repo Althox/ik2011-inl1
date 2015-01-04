@@ -24,7 +24,7 @@ public class UserDAO implements Serializable {
 
     private Connection con;
     private static UserDAO instance;
-
+    
     private UserDAO() throws SQLException {
         this.con = DAOUtil.connect();
     }
@@ -39,7 +39,8 @@ public class UserDAO implements Serializable {
     }
 
     public boolean login(User user) throws SQLException {
-        CallableStatement stmt = con.prepareCall("{ call p_login(?,?) }");
+        con = DAOUtil.connect();
+        CallableStatement stmt = con.prepareCall("{ call p_login(?, ?) }");
         stmt.setString(1, user.getUsername());
         stmt.setString(2, user.getPassword());
         ResultSet rs = stmt.executeQuery();
@@ -54,7 +55,17 @@ public class UserDAO implements Serializable {
         
         return false;
     }
-
+    
+    public boolean changePassword(User user, String oldPassword, String newPassword) throws SQLException {
+        
+        PreparedStatement s = con.prepareStatement("UPDATE user SET password = ? WHERE user_id = ? AND password = ?");
+        s.setString(1, newPassword);
+        s.setInt(2, user.getId());
+        s.setString(3, oldPassword);
+        
+        return s.executeUpdate() != 0;
+    }
+    
     private Team getAssociatedTeam(int teamId) {
         Team team = new Team();
         try {

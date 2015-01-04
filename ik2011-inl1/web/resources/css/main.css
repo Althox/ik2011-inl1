@@ -19,3 +19,15 @@ and open the template in the editor.
 #main_banner {
     width: 100%;
 }
+
+#messageBar {
+    background: #cccccc;
+}
+
+.max_width {
+    width: 100%;
+}
+
+.error_message {
+    color: #ff3333;
+}

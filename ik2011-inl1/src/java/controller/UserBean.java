@@ -10,11 +10,10 @@ import Util.SessionUtil;
 import model.User;
 import java.io.Serializable;
 import java.sql.SQLException;
-import javax.faces.application.FacesMessage;
-import javax.faces.context.FacesContext;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 import javax.enterprise.context.SessionScoped;
+import messages.Message;
 
 /**
  *
@@ -35,11 +34,8 @@ public class UserBean implements Serializable {
             if (dao.login(user)) {
                 loggedIn = true;
             } else {
-                FacesContext.getCurrentInstance().addMessage(
-                        null,
-                        new FacesMessage(FacesMessage.SEVERITY_WARN,
-                                "Invalid Login!",
-                                "Please Try Again!"));
+                //FacesContext.getCurrentInstance().addMessage(null, new FacesMessage("Test"));
+                Message.addMessageToContext(Message.ERROR_LOGIN_FAILED);
             }
         } catch (SQLException e) {
             System.out.println(e.getClass() + " " + e.getMessage());
@@ -48,6 +44,7 @@ public class UserBean implements Serializable {
                 System.out.println(el.getLineNumber() + ": " + el.getFileName());
             }
         } catch (Exception e) {
+            
             return "";
         }
         return "";
@@ -58,10 +55,38 @@ public class UserBean implements Serializable {
         sesson.invalidate();
         inUser = null;
         loggedIn = false;
+        
+        Message.addMessageToContext(Message.SUCCESS_LOGGED_OUT);
         return "";
     }
     
     public boolean isLoggedIn() {
         return this.loggedIn;
+    }
+    
+    public String changePassword(User user, String oldPass, String newPass, String newPassMatch) {
+        
+        if (oldPass.isEmpty() || newPass.isEmpty() || newPassMatch.isEmpty()) {
+            Message.addMessageToContext(Message.ERROR_ALL_REQUIRED);
+        }
+        
+        if (newPass.equals(newPassMatch)) {
+            try {
+                UserDAO dao = UserDAO.getInstance();
+                if(dao.changePassword(user, oldPass, newPass)) {
+                    Message.addMessageToContext(Message.SUCCESS_PASSWORD_CHANGED);
+                    return "";
+                }
+                else
+                    Message.addMessageToContext(Message.ERROR_PASSWORD_INCORRECT);
+            } catch(SQLException sqle) {
+                Message.addMessageToContext(Message.ERROR_UNKNOWN);
+                return "";
+            }
+        } else {
+            Message.addMessageToContext(Message.ERROR_PASSWORD_MISMATCH);
+        }
+        
+        return "";
     }
 }
