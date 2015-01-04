@@ -92,13 +92,13 @@ public class LeagueBean implements Serializable {
 
             ArrayList<Standing> standings = generateStandings(matches);
             this.upcomingMatches = generateUpcomingMatches(matches, 5);
-
+            
             generateRowStyling(standings);
             return standings;
         } catch (Exception sqle) {
-            Message.addMessageToContext("Feltyp " + sqle.getClass() + " - " + sqle.getMessage());
+            Message.outputMessage("Feltyp " + sqle.getClass() + " - " + sqle.getMessage());
             for (StackTraceElement ste : sqle.getStackTrace()) {
-                Message.addMessageToContext(ste.getLineNumber() + " -> " + ste.getFileName());
+                Message.outputMessage(ste.getLineNumber() + " -> " + ste.getFileName());
             }
 
         }

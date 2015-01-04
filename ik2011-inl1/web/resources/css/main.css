@@ -80,3 +80,11 @@ and open the template in the editor.
 .standings_unscathed_class {
     
 }
+
+#updateScoreForm {
+    width: 100%;
+}
+
+#updateScoreForm td {
+    padding: 5px;
+}

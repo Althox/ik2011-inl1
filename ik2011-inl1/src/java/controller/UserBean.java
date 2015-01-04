@@ -57,7 +57,7 @@ public class UserBean implements Serializable {
         loggedIn = false;
         
         Message.outputMessage(Message.SUCCESS_LOGGED_OUT);
-        return "";
+        return "index.html";
     }
     
     public boolean isLoggedIn() {

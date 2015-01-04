@@ -47,10 +47,10 @@ public enum Message {
         FacesContext context = FacesContext.getCurrentInstance();
         ResourceBundle bundle = context.getApplication().getResourceBundle(context, "messages");
         String returnMessage = bundle.getString(message.getKey());
-        Message.addMessageToContext(returnMessage);
+        Message.outputMessage(returnMessage);
     }
     
-    public static void addMessageToContext(String message) {
+    public static void outputMessage(String message) {
         FacesContext context = FacesContext.getCurrentInstance();
         context.addMessage("displayAtTop", new FacesMessage(message));
     }

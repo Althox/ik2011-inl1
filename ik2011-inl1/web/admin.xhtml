@@ -15,6 +15,7 @@
                 <b:row>
                     <b:column col-md="3" col-sm="12">
                         <b:panel title="Ligor">
+                            <h:outputText value="Här visas en lista över ligor som ditt lag deltar i." />
                             <h:dataTable value="#{adminBean.getLeaguesForTeam(user.associatedTeam)}" var="leagues" class="table table-striped">
                                 <h:column>
                                     <h:outputText value="#{leagues.name}"/>
@@ -32,45 +33,86 @@
                         </b:panel>
                     </b:column>
                     <b:column col-md="9" col-sm="12">
-                        <b:panel title="Matchresultat">
-                            <b:alert severity="info" rendered="#{adminBean.hasSelectedLeague()}" closable="true" title="Instruktioner: ">#{messages.adminMatchResultInstructions}</b:alert>
-                                
-                            <b:alert severity="danger" rendered="#{not adminBean.hasSelectedLeague()}">#{messages.moreThanOneLeagueInstructions}</b:alert>
-                            <h:form rendered="#{adminBean.hasSelectedLeague()}">
-                                <h:dataTable value="#{adminBean.getMatchesForTeam(user.associatedTeam)}" var="matches" class="table table-striped">
-                                    <h:column>
-                                        <h:outputText value="#{matches.home.name}" />
-                                    </h:column>
-                                    <h:column>
-                                        <h:outputText value="#{matches.homeScore}" rendered="#{matches.homeScore != -1}" />
-                                    </h:column>
-                                    <h:column>
-                                        <h:outputText value="-" />
-                                    </h:column>
-                                    <h:column>
-                                        <h:outputText value="#{matches.awayScore}" rendered="#{matches.homeScore != -1}" />
-                                    </h:column>
-                                    <h:column>
-                                        <h:outputText value="#{matches.away.name}" />
-                                    </h:column>
-                                    <h:column>
-                                        <h:outputText value="#{matches.date}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
-                                        </h:outputText>
-                                    </h:column>
-                                    <h:column>
-                                        <!-- <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#{adminBean.isUpdatePressed(matches, matches.id)}"  value="Rapportera resultat" look="primary" size="xs" />-->
-                                        <h:form id="updateScoreForm" rendered="#{adminBean.isUpdatePressed(matches, matches.id)}">
-                                            <b:inputText placeholder="Hemma poäng" span="7" id="homeScore" value="#{matches.homeScore}" />
-                                            <b:inputText placeholder="Borta poäng" span="7" id="awayScore" value="#{matches.awayScore}" />
-                                            <h:commandButton action="#{adminBean.reportScores(matches, matches.homeScore, matches.awayScore)}" class="btn btn-success btn-xs" value="Uppdatera" />
-                                        </h:form>
-                                    </h:column>
-                                </h:dataTable>
-                            </h:form>
-                        </b:panel>
+                        <b:row>
+                            <b:panel title="Matchresultat">
+                                <b:alert severity="info" rendered="#{adminBean.hasSelectedLeague()}" closable="true" title="Instruktioner: ">#{messages.adminMatchResultInstructions}</b:alert>
+
+                                <b:alert severity="danger" rendered="#{not adminBean.hasSelectedLeague()}">#{messages.moreThanOneLeagueInstructions}</b:alert>
+                                <h:form rendered="#{adminBean.hasSelectedLeague()}">
+                                    <h:dataTable value="#{adminBean.getMatchesForTeam(user.associatedTeam)}" var="matches" class="table table-striped">
+                                        <h:column>
+                                            <h:outputText value="#{matches.home.name}" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:outputText value="#{matches.homeScore}" rendered="#{matches.homeScore != -1}" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:outputText value="-" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:outputText value="#{matches.awayScore}" rendered="#{matches.homeScore != -1}" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:outputText value="#{matches.away.name}" />
+                                        </h:column>
+                                        <h:column>
+                                            <h:outputText value="#{matches.date}">
+                                                <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                                            </h:outputText>
+                                        </h:column>
+                                        <h:column>
+                                            <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#{adminBean.setMatchToUpdate(matches)}"  value="Rapportera resultat" look="primary" size="xs" />
+                                        </h:column>
+                                    </h:dataTable>
+                                </h:form>
+                            </b:panel>
+                        </b:row>
+                        <b:row rendered="#{adminBean.isUpdating()}">
+                            <b:column col-md="12">
+                                <h:form id="updateScoreForm">
+                                    <b:panel title="Rapportera resultat för matchen mellan #{adminBean.getMatchToUpdate().home.name} och #{adminBean.getMatchToUpdate().away.name}">
+                                        <b:alert severity="info" closable="true" title="Instruktioner: ">#{messages.adminReportResultsInstructions}</b:alert>
+
+                                        <table>
+                                            <tr>
+                                                <td colspan="5">
+                                                    <h:outputText value="Datum: " />
+                                                    <h:outputText value="#{adminBean.getMatchToUpdate().date}" >
+                                                        <f:convertDateTime pattern="yyyy-MM-dd HH:mm" />
+                                                    </h:outputText>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <h:outputText value="#{adminBean.getMatchToUpdate().home.name}" />
+                                                </td>
+                                                <td>
+                                                    <b:inputText placeholder="Mål" binding="#{homeScore}" />
+                                                </td>
+                                                <td>
+                                                    <h:outputText value=" - " />
+                                                </td>
+                                                <td>
+                                                    <b:inputText placeholder="Mål" binding="#{awayScore}" />
+                                                </td>
+                                                <td>
+                                                    <h:outputText value="#{adminBean.getMatchToUpdate().away.name}" />
+                                                </td>
+                                            </tr>
+                                        </table>
+
+                                        <f:facet name="footer">
+                                            <b:commandButton action="#{adminBean.reportScores(adminBean.getMatchToUpdate(), homeScore.value, awayScore.value)}" look="success" value="Rapportera" />
+                                            #{" "}
+                                            <b:commandButton action="#{adminBean.setMatchToUpdate(null)}" look="danger" value="Avbryt" />
+                                        </f:facet>
+                                    </b:panel>
+                                </h:form>
+                            </b:column>
+                        </b:row>
                     </b:column>
                 </b:row>
+
             </ui:define>
         </ui:composition>
     </h:body>

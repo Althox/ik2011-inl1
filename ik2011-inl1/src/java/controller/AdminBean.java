@@ -27,14 +27,25 @@ import messages.Message;
 public class AdminBean implements Serializable {
 
     private int selectedLeagueId = -1;
-    
+    private Match matchToUpdate = null;
     public AdminBean() {
 
     }
     
-    public boolean isUpdatePressed(Match match, int matchId){
-        Date today = new Date();
-        return match.getDate().before(today) && match.getAwayScore() == -1 && match.getHomeScore() == -1 && match.getId() == matchId;
+    public Match getMatchToUpdate() {
+        return this.matchToUpdate;
+    }
+    
+    public void setMatchToUpdate(Match match) {
+        this.matchToUpdate = match;
+    }
+    
+    public boolean isUpdating(){
+        
+        return matchToUpdate != null;
+        
+        /*Date today = new Date();
+        return match.getDate().before(today) && match.getAwayScore() == -1 && match.getHomeScore() == -1 && match.getId() == matchId;*/
     }
 
     public ArrayList<Match> getMatchesForTeam(Team team) {
@@ -47,7 +58,7 @@ public class AdminBean implements Serializable {
         try {
             list = TeamDAO.getInstance().getMatchesForTeam(team, selectedLeagueId);
         } catch (SQLException e) {
-            Message.addMessageToContext(e.getMessage());
+            Message.outputMessage(e.getMessage());
         }
         return list;
     }
@@ -57,7 +68,7 @@ public class AdminBean implements Serializable {
         try {
             list = TeamDAO.getInstance().getLeaguesForTeam(team);
         } catch (SQLException e) {
-            Message.addMessageToContext(e.getMessage());
+            Message.outputMessage(e.getMessage());
         }
         if (list.size() == 1) {
             selectedLeagueId = list.get(0).getId();
@@ -89,6 +100,12 @@ public class AdminBean implements Serializable {
     }
 
     public String reportScores(Match match, String homeScore, String awayScore) {
+        
+        if (homeScore.isEmpty() || awayScore.isEmpty()) {
+            Message.outputMessage(Message.ERROR_ALL_REQUIRED);
+            return "";
+        }
+            
         try {
             match.setHomeScore(Integer.parseInt(homeScore));
             match.setAwayScore(Integer.parseInt(awayScore));
@@ -98,10 +115,13 @@ public class AdminBean implements Serializable {
 
         try {
             LeagueDAO dao = LeagueDAO.getInstance();
+            dao.connect();
             dao.uploadMatchResult(match);
+            dao.disconnect();
+            matchToUpdate = null;
             Message.outputMessage(Message.SUCCESS_RESULTS_REPORTED);
         } catch (SQLException sqle) {
-            Message.outputMessage(Message.ERROR_UNKNOWN);
+            Message.outputMessage(sqle.getMessage());
         }
         return "";
     }

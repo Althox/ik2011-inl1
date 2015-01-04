@@ -223,7 +223,7 @@ public class LeagueDAO {
         PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
         stmnt.setInt(1, match.getId());
         stmnt.setInt(2, match.getHomeScore());
-        stmnt.setInt(2, match.getAwayScore());
+        stmnt.setInt(3, match.getAwayScore());
         stmnt.executeUpdate();
         stmnt.close();
     }
