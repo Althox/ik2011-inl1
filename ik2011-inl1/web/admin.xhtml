@@ -9,31 +9,26 @@
         <title>Facelet Title</title>
     </h:head>
     <h:body>
-        <ui:composition template="/templates/adminLayout.xhtml">
+        <ui:composition template="/templates/adminMasterLayout.xhtml">
             <ui:define name="content">
                 
                 <b:row>
-                    <h1><h:outputText value="#{user.associatedTeam}"/></h1>
+                    <h1><h:outputText value="#{user.associatedTeam.name}"/></h1>
                     <b:column col-md="6" col-sm="12">
                         <b:panel title="Lägg Till Matchresultat" >
                             <h:form>
-                                <h:dataTable value="#{leagueBean}" var="league" class="table table-striped">
+                                <h:dataTable value="" var="matches" class="table table-striped">
                                     <h:column>
                                         <f:facet name="header">ID</f:facet>
-                                        <h:outputText value="" />
+                                        <h:outputText value="#{matches.id}" />
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Match</f:facet>
-                                        <h:outputText value="" />
+                                        <f:facet name="header">Säsong</f:facet>
+                                        <h:outputText value="#{matches.season}" />
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Lag</f:facet>
-                                        <h:outputText value="" />
-                                    </h:column>
-                                    <h:column>
-                                        <f:facet name="header">Poäng</f:facet>
-                                        <h:outputText value="" />
-                                        <h:inputText value="" rendered=""/>
+                                        <f:facet name="header">Namn</f:facet>
+                                        <h:outputText value="#{matches.name}" />
                                     </h:column>
                                     <h:column>
                                         <h:commandLink rendered="" action="#" id="editLink" value="Uppdatera" class="btn btn-primary btn-sm">
@@ -47,10 +42,28 @@
                             </h:form>
                         </b:panel>
                     </b:column>
+                    <b:column col-md="6" col-sm="12">
+                        <b:panel title="Tillhörande Ligor">
+                            <h:dataTable value="#{adminBean.getTeamsForLeague(user.associatedTeam)}" var="leagues" class="table table-striped">
+                                <h:column>
+                                    <f:facet name="header">ID</f:facet>
+                                    <h:outputText value="#{leagues.id}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">Liga</f:facet>
+                                    <h:outputText value="#{leagues.name}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">År</f:facet>
+                                    <h:outputText value="#{leagues.season}"/>
+                                </h:column>
+                            </h:dataTable>
+                        </b:panel>
+                    </b:column>
                 </b:row>
                 
                 <!-- SUCCESS ALERTS -->
-                <b:alert severity="success"><strong>Uppdaterat!</strong></b:alert>
+                <b:alert rendered="" severity="success" closable="true"><strong>Uppdaterat!</strong></b:alert>
                 <!-- -->
                 
             </ui:define>
