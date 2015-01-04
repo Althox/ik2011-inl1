@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.GregorianCalendar;
 import java.util.Iterator;
 import model.League;
@@ -30,6 +31,8 @@ public abstract class MatchupGenerator {
         ArrayList<Team> teams = league.getTeams();
         Collections.shuffle(teams);
         
+        
+        // TODO: Ändra i vilken ordning matcher tilldelas, ett lag i början av listan har större chanser att få matcher tilldelade för tidigare datum än alla andra.
         for (Team t : teams) {
 
             int currTeamIndex = teams.indexOf(t);
@@ -118,7 +121,6 @@ public abstract class MatchupGenerator {
         
         matchesPerRound = matches.size() / numOfRounds;
         ArrayList<Round> rounds = new ArrayList();
-        Date currentDate = getLeagueStartDate(seasonYear);
         
         // När en match tilldelats en runda kommer matchen att tas bort, därmed kommer loopen sluta när alla matcher tilldelats en runda.
         while (!matches.isEmpty()) {
@@ -138,14 +140,26 @@ public abstract class MatchupGenerator {
                     }
                 }
             }
-            round.setDate(currentDate);
             rounds.add(round);
-            
-            currentDate = addDaysToDate(currentDate, leagueStructure.getDaysBetweenMatches());
         }
         
+        // Försöker minimera risken att ett lag får spela oftare än andra i början av säsongen.
+        Collections.sort(rounds, new Comparator<Round>() {
+            @Override
+            public int compare(Round one, Round two) {
+                if (two.containsAnyTeam(one))
+                    return -1;
+                else
+                    return 0;
+            }
+        });
+        
+        Date currentDate = getLeagueStartDate(seasonYear);
         for (Round round : rounds) {
+            round.setDate(currentDate);
             matches.addAll(round.getMatches());
+            
+            currentDate = addDaysToDate(currentDate, leagueStructure.getDaysBetweenMatches());
         }
     }
     

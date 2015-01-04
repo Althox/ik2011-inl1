@@ -107,11 +107,16 @@ public class UploadDataServlet extends HttpServlet {
                         l.setMatches(MatchupGenerator.generateSeasonMatchups(l, LeagueStructure.ROUND_ROBIN));
                     }
                     
+                    
                     LeagueDAO dao = LeagueDAO.getInstance();
+                    
+                    dao.connect();
                     leagues = dao.uploadLeagueData(leagues);
                     
                     for (League l : leagues) {
                         ArrayList<Match> matches = dao.getMatchesForLeague(l);
+                        if (matches.isEmpty())
+                            throw new Exception("Empty matches");
                         Iterator<Match> it = matches.iterator();
                         Date today = new Date();
                         while (it.hasNext()) {
@@ -124,7 +129,7 @@ public class UploadDataServlet extends HttpServlet {
                         
                         dao.uploadMatchResults(matches);
                     }
-                    
+                    dao.disconnect();
                     for (League l : leagues) {
                         out.println("<h2>"+l.getName()+" ("+l.getId()+")</h2>");
                         out.println("<table>");

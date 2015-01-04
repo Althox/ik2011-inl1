@@ -50,6 +50,16 @@ public class Round {
         return found;
     }
     
+    public boolean containsAnyTeam(Round round) {
+        boolean found = false;
+        
+        for (Match match : round.getMatches()) {
+            found = containsTeam(match.getHome()) || containsTeam(match.getAway());
+        }
+        
+        return found;
+    }
+    
     public ArrayList<Match> getMatches() {
         return new ArrayList(matches);
     }

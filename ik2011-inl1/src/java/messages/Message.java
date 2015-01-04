@@ -21,9 +21,10 @@ public enum Message {
     ERROR_LOGIN_FAILED("loginFailed", FacesMessage.SEVERITY_WARN),
     ERROR_REQUIRED("required", FacesMessage.SEVERITY_ERROR),
     ERROR_ALL_REQUIRED("allFieldsRequired", FacesMessage.SEVERITY_ERROR),
-    ERROR_UNKNOWN("unknownError", FacesMessage.SEVERITY_ERROR),
+    ERROR_UNKNOWN("unknownError", FacesMessage.SEVERITY_FATAL),
     ERROR_PASSWORD_MISMATCH("passwordMismatch", FacesMessage.SEVERITY_ERROR),
-    ERROR_PASSWORD_INCORRECT("passwordIncorrect", FacesMessage.SEVERITY_ERROR);
+    ERROR_PASSWORD_INCORRECT("passwordIncorrect", FacesMessage.SEVERITY_ERROR),
+    ERROR_NO_DATA_FOUND("noDataFound", FacesMessage.SEVERITY_FATAL);
 
     private final String key;
     private final Severity severity;

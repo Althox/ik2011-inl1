@@ -22,7 +22,11 @@
                         #{" "}
                         <b:commandButton value="Logga in" look="primary"  size="sm" action="#{userBean.login(user)}" ajax="false" />
                     </h:form>
-                    <b:navLink value="Inloggad som: #{user.username}" rendered="#{userBean.loggedIn}" href="#" />
+                    <li>
+                        <a class="no_styling_menu_item">
+                            <h:outputText value="Inloggad som: #{user.username}" rendered="#{userBean.loggedIn}" />
+                        </a>
+                    </li>
 
                     <h:form styleClass="navbar-form navbar-right" rendered="#{userBean.loggedIn}">
                         <b:commandButton value="Logga ut" look="danger" size="sm" action="#{userBean.logout(user)}" />

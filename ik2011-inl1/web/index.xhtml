@@ -11,7 +11,7 @@
         <ui:composition template="/templates/frontEndMasterLayout.xhtml">
             <ui:define name="content">
                 <b:row>
-                    <b:column col-md="4" col-sm="12">
+                    <!--<b:column col-md="4" col-sm="12">
                         <b:panel title="Serier">
                             <h:outputText value="#{userBean} AND #{user}" />
                             <br />
@@ -27,44 +27,67 @@
                                 </h:column>
                             </h:dataTable>
                         </b:panel>
-                    </b:column>
-                    <b:column col-md="8" col-sm="12">
-                        <b:panel title="Matcher">
+                    </b:column>-->
+                    <b:column col-md="12" col-sm="12">
+                        <b:panel>
                             <b:navBar inverse="false">
                                 <b:navbarLinks>
                                     <b:dropMenu value="Välj Serie">
-                                        <form id="serieform">
-                                            <h:dataTable value="#{leagueBean}" var="games">
-                                                <b:navLink>
-                                                    <f:ajax render="@form" execute="@form"></f:ajax> 
-                                                    <h:commandButton value="#{games}" />
-                                                </b:navLink>
-                                            </h:dataTable>
-                                        </form>
+                                        <h:dataTable value="#{leagueController.getAllLeagues()}" var="league">
+                                            <h:column>
+                                                <li>
+                                                    <h:form id="serieform"><h:commandLink class="dropdownStyle" value="#{league.name}" action="#{leagueController.selectLeague(league.id)}" /></h:form>
+                                                </li>
+                                            </h:column>
+                                        </h:dataTable>
                                     </b:dropMenu>
                                 </b:navbarLinks>
                             </b:navBar>
                             <form id="matchResultForm">
-                                <h:dataTable value="#{leagueBean}" var="results" class="table table-striped">
+                                <h3><h:outputText value="#{leagueController.getSelectedLeague().name}" rendered="#{not empty leagueController.getSelectedLeague()}" /></h3>
+                                <h:dataTable value="#{leagueController.getStandings()}" var="standing" class="table" rowClasses="#{leagueController.getRowStylings()}">
                                     <h:column>
-                                        <f:facet name="header">Datum</f:facet>
-                                        <h:outputText value="#{results}"/>
+                                        <f:facet name="header">#</f:facet>
+                                        <h:outputText value="#{standing.position}" />
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">ID</f:facet>
-                                        <h:outputText value="#{results}"/>
+                                        <f:facet name="header">Lag</f:facet>
+                                        <h:outputText value="#{standing.team.name}"/>
+                                    </h:column>
+                                    <h:column />
+                                    <h:column>
+                                        <f:facet name="header">V</f:facet>
+                                        <h:outputText value="#{standing.wins}"/>
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Hemma</f:facet>
-                                        <h:outputText value="#{results}"/>
+                                        <f:facet name="header">O</f:facet>
+                                        <h:outputText value="#{standing.tied}"/>
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Borta</f:facet>
-                                        <h:outputText value="#{results}"/>
+                                        <f:facet name="header">F</f:facet>
+                                        <h:outputText value="#{standing.losses}"/>
                                     </h:column>
                                     <h:column>
-                                        <f:facet name="header">Resultat</f:facet>
-                                        <h:outputText value="#{results}"/>
+                                        <f:facet name="header">S</f:facet>
+                                        <h:outputText value="#{standing.matchesPlayed}" />
+                                    </h:column>
+                                    <h:column />
+                                    <h:column>
+                                        <f:facet name="header">MF</f:facet>
+                                        <h:outputText value="#{standing.goalsFor}" />
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">ME</f:facet>
+                                        <h:outputText value="#{standing.goalsAgainst}" />
+                                    </h:column>
+                                    <h:column>
+                                        <f:facet name="header">+/-</f:facet>
+                                        <h:outputText value="#{standing.goalsFor - standing.goalsAgainst}"/>
+                                    </h:column>
+                                    <h:column />
+                                    <h:column>
+                                        <f:facet name="header">TP</f:facet>
+                                        <h:outputText value="#{standing.totalPoints}" />
                                     </h:column>
                                 </h:dataTable>
                             </form>

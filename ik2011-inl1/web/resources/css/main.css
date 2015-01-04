@@ -31,3 +31,52 @@ and open the template in the editor.
 .error_message {
     color: #ff3333;
 }
+
+.dropdownStyle {
+    background-attachment: scroll;
+    background-clip: border-box;
+    background-color: transparent;
+    background-image: none;
+    background-origin: padding-box;
+    background-position: 0% 0%;
+    background-repeat: repeat;
+    background-size: auto auto;
+    box-sizing: border-box;
+    clear: both;
+    color: #333;
+    display: block;
+    font-family: Calibri,Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 20px;
+    list-style-image: none;
+    list-style-position: outside;
+    list-style-type: none;
+    padding-bottom: 3px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-top: 3px;
+    text-alignlefttext-decoration: none;
+    white-space: nowrap;
+    -moz-text-decoration-color: #333;
+    -moz-text-decoration-line: none;
+    -moz-text-decoration-style: solid;
+}
+
+.dropdownStyle:hover {
+    text-decoration: none;
+    color: #262626;
+    background-color: #F5F5F5;
+}
+
+.standings_advance_class {
+    background: #edfbed;
+}
+
+.standings_regress_class {
+    background: #fcf4f4;
+}
+
+.standings_unscathed_class {
+    
+}
