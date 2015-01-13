@@ -8,14 +8,18 @@
         <title>LigaSystem</title>
         <h:outputStylesheet name="main.css" library="css"/>
         <h:outputScript name="main.js" library="js" />
+        <h:outputScript name="admin.js" library="js" />
     </h:head>
     <h:body>
-        <ui:include src="/templates/sections/header.xhtml" />
-        <b:container>
-            <ui:include src="/templates/sections/messageModal.xhtml" />
-            <ui:insert name="content" />
-        </b:container>
-        
+        <div id="nonFooter">
+            <ui:include src="/templates/sections/header.xhtml" />
+
+            <b:container id="content">
+                <ui:include src="/templates/sections/messageModal.xhtml" />
+                <ui:insert name="content" />
+            </b:container>
+        </div>
+
         <ui:include src="/templates/sections/footer.xhtml" />
     </h:body>
 </html>

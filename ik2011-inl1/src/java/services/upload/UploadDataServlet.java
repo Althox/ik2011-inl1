@@ -9,9 +9,11 @@ import DAL.LeagueDAO;
 import DAL.UserDAO;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.MatchGenerator;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.lang.reflect.Type;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -94,31 +96,15 @@ public class UploadDataServlet extends HttpServlet {
 
         try {
             PrintWriter out = response.getWriter();
-            ResourceBundle rb = ResourceBundle.getBundle("messages.messages");
-            
+
             // Kollar autentisering och authorisering
-            boolean allowed = false;
-            try {
-                UserDAO uDao = UserDAO.getInstance();
-                User user = new User(username, pass);
-                if (uDao.login(user)) {
-
-                    if (user.getRole().getName().equals(UserRole.LEAGUE_ADMINISTRATOR)) {
-                        allowed = true;
-                    } else {
-                        out.println(rb.getString(Message.ERROR_UNAUTHORIZED.getKey()));
-                    }
-
-                } else {
-                    out.println(rb.getString(Message.ERROR_LOGIN_FAILED.getKey()));
-                }
-
-            } catch (Exception e) {
-                out.println(rb.getString(Message.ERROR_LOGIN_FAILED.getKey()));
+            String errorMessage;
+            if (!(errorMessage = testCredentials(username, pass)).equals("")) {
+                out.print(errorMessage); // Skriver ut felmeddelandet.
                 return;
             }
 
-            if (leaguesJson != null && !leaguesJson.isEmpty() && allowed) {
+            if (leaguesJson != null && !leaguesJson.isEmpty()) {
                 try {
                     Gson gson = new Gson();
                     Type collectionType = new TypeToken<ArrayList<League>>() {
@@ -130,33 +116,8 @@ public class UploadDataServlet extends HttpServlet {
                         l.setMatches(MatchupGenerator.generateSeasonMatchups(l, LeagueStructure.ROUND_ROBIN));
                     }
 
-                    LeagueDAO dao = LeagueDAO.getInstance();
+                    upload(leagues);
 
-                    dao.connect();
-                    leagues = dao.uploadLeagueData(leagues);
-
-                    for (League l : leagues) {
-                        ArrayList<Match> matches = dao.getMatchesForLeague(l);
-                        if (matches.isEmpty()) {
-                            throw new Exception("Empty matches");
-                        }
-                        Iterator<Match> it = matches.iterator();
-                        Date today = new Date();
-                        while (it.hasNext()) {
-                            Match match = it.next();
-                            if (match.getDate().before(today)) {
-                                MatchupGenerator.generateRandomScores(match);
-                            } else {
-                                it.remove(); // Vi vill inte ha match-resultat för matcher som inte har passerat
-                            }
-                        }
-                        /*for (int i = matches.size()-1; i > Math.(matches.size() / 3); i--) { // Remove some match-results. so we have something to report.
-                            matches.remove(i);
-                        }*/
-                        
-                        dao.uploadMatchResults(matches);
-                    }
-                    dao.disconnect();
                     out.println("<h1>Uppladdning lyckades! Här följer lite info:</h1>");
                     for (League l : leagues) {
                         out.println("<h2>" + l.getName() + " (" + l.getId() + ")</h2>");
@@ -183,7 +144,7 @@ public class UploadDataServlet extends HttpServlet {
                 }
             }
         } catch (IOException ioe) {
-            
+
         }
     }
 
@@ -196,5 +157,42 @@ public class UploadDataServlet extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }
+    
+    private void upload(ArrayList<League> leagues) throws SQLException, Exception {
+        LeagueDAO dao = new LeagueDAO();
 
+        dao.connect();
+        leagues = dao.uploadLeagueData(leagues);
+
+        for (League l : leagues) {
+            ArrayList<Match> matches = dao.getMatchesForLeague(l); // We need the id of the matches. (getGeneratedKeys() is not supported for BatchInserts) Hence why we don't have them yet.
+            if (matches.isEmpty()) {
+                throw new Exception("Empty matches");
+            }
+            MatchupGenerator.generatMatchResults(matches);
+            dao.uploadMatchResults(matches);
+        }
+        dao.disconnect();
+    }
+
+    private String testCredentials(String username, String pass) {
+        ResourceBundle rb = ResourceBundle.getBundle("messages.messages");
+        try {
+            UserDAO uDao = UserDAO.getInstance();
+            User user = new User(username, pass);
+            if (uDao.login(user)) {
+
+                if (!user.getRole().getName().equals(UserRole.LEAGUE_ADMINISTRATOR)) {
+                    return rb.getString(Message.ERROR_UNAUTHORIZED.getKey());
+                }
+
+            } else {
+                return rb.getString(Message.ERROR_LOGIN_FAILED.getKey());
+            }
+
+        } catch (Exception e) {
+            return rb.getString(Message.ERROR_LOGIN_FAILED.getKey());
+        }
+        return "";
+    }
 }

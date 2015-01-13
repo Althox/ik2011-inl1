@@ -6,7 +6,6 @@
 
 
 $(document).ready(function () {
-    setTimeout(function () {
-        $("#displayAtTopMessage").slideUp();
-    }, 5000);
+    $("#updateScoreForm\\:reportHomeScoreField").val("");
+    $("#updateScoreForm\\:reportAwayScoreField").val("");
 });

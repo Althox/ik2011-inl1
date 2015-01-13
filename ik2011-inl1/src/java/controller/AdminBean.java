@@ -14,6 +14,8 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.enterprise.context.SessionScoped;
 import javax.inject.Named;
 import messages.Message;
@@ -28,6 +30,7 @@ public class AdminBean implements Serializable {
 
     private int selectedLeagueId = -1;
     private Match matchToUpdate = null;
+    
     public AdminBean() {
 
     }
@@ -56,7 +59,10 @@ public class AdminBean implements Serializable {
         }
 
         try {
-            list = TeamDAO.getInstance().getMatchesForTeam(team, selectedLeagueId);
+            TeamDAO dao = new TeamDAO();
+            dao.connect();
+            list = dao.getMatchesForTeam(team, selectedLeagueId);
+            dao.disconnect();
         } catch (SQLException e) {
             Message.outputMessage(e.getMessage());
         }
@@ -66,7 +72,10 @@ public class AdminBean implements Serializable {
     public ArrayList<League> getLeaguesForTeam(Team team) {
         ArrayList<League> list = new ArrayList<>();
         try {
-            list = TeamDAO.getInstance().getLeaguesForTeam(team);
+            TeamDAO dao = new TeamDAO();
+            dao.connect();
+            list = dao.getLeaguesForTeam(team);
+            dao.disconnect();
         } catch (SQLException e) {
             Message.outputMessage(e.getMessage());
         }
@@ -111,10 +120,11 @@ public class AdminBean implements Serializable {
             match.setAwayScore(Integer.parseInt(awayScore));
         } catch (NumberFormatException nfe) {
             Message.outputMessage(Message.ERROR_NOT_A_NUMBER);
+            return "";
         }
 
         try {
-            LeagueDAO dao = LeagueDAO.getInstance();
+            LeagueDAO dao = new LeagueDAO();
             dao.connect();
             dao.uploadMatchResult(match);
             dao.disconnect();
@@ -123,6 +133,18 @@ public class AdminBean implements Serializable {
         } catch (SQLException sqle) {
             Message.outputMessage(sqle.getMessage());
         }
+        
         return "";
+    }
+    
+    public void removeAllResults(int teamId) {
+        try {
+            LeagueDAO dao = new LeagueDAO();
+            dao.connect();
+            dao.removeAllResults(teamId, selectedLeagueId);
+            dao.disconnect();
+        } catch (SQLException ex) {
+            Logger.getLogger(AdminBean.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 }

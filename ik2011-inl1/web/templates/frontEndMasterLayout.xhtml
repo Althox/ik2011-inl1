@@ -11,19 +11,21 @@
         <h:outputScript name="main.js" library="js" />
     </h:head>
     <h:body>
-        <ui:include src="/templates/sections/header.xhtml" />
+        <div id="nonFooter">
+            <ui:include src="/templates/sections/header.xhtml" />
 
-        <b:container>
-            <ui:include src="/templates/sections/messageModal.xhtml" />
-            <b:row>
-                <div id="main_banner_container">
-                    <h:graphicImage id="main_banner" url="/images/main_banner.jpg" alt="Välkommen!" />
-                </div>
-            </b:row>
-            <b:row>
-                <ui:insert name="content" />
-            </b:row>
-        </b:container>
+            <b:container id="content">
+                <ui:include src="/templates/sections/messageModal.xhtml" />
+                <b:row>
+                    <div id="main_banner_container">
+                        <h:graphicImage id="main_banner" url="/images/main_banner.jpg" alt="Välkommen!" />
+                    </div>
+                </b:row>
+                <b:row>
+                    <ui:insert name="content" />
+                </b:row>
+            </b:container>
+        </div>
         <ui:include src="/templates/sections/footer.xhtml" />
     </h:body>
 </html>

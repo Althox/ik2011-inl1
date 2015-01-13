@@ -30,18 +30,17 @@ public class LeagueDAO {
     private final String ID_COLUMN = "league_id";
     private final String NAME_COLUMN = "name";
 
-    private LeagueDAO() throws SQLException {
+    public LeagueDAO() throws SQLException {
         //this.con = DAOUtil.connect();
     }
 
-    public static synchronized LeagueDAO getInstance() throws SQLException {
+    /*public static synchronized LeagueDAO getInstance() throws SQLException {
 
-        if (instance == null) {
-            instance = new LeagueDAO();
-        }
-        return instance;
-    }
-
+     if (instance == null) {
+     instance = new LeagueDAO();
+     }
+     return instance;
+     }*/
     public void connect() throws SQLException {
         con = DAOUtil.connect();
     }
@@ -59,12 +58,16 @@ public class LeagueDAO {
         if (rs != null) {
             if (rs.first()) {
                 league = DAOUtil.parseBasicLeagueInformation(rs);
+                rs.close();
+                stmnt.close();
                 return league;
             } else {
+                stmnt.close();
                 throw new SQLException("Empty result for league_id: " + leagueId);
             }
         }
-        throw new SQLException("Anslutningfel: ID mottagen - "+leagueId+" Con. öppen - "+!con.isClosed());
+        stmnt.close();
+        throw new SQLException("Anslutningfel: ID mottagen - " + leagueId + " Con. öppen - " + !con.isClosed());
     }
 
     public ArrayList<League> getAllLeagues() throws SQLException {
@@ -77,6 +80,9 @@ public class LeagueDAO {
         while (results.next()) {
             leagues.add(DAOUtil.parseBasicLeagueInformation(results));
         }
+        results.close();
+        results.close();
+        smnt.close();
 
         return leagues;
     }
@@ -195,8 +201,10 @@ public class LeagueDAO {
                 teamStatement.execute();
                 ResultSet trs = teamStatement.getGeneratedKeys();
                 t.setId(getReturnedId(trs));
+                trs.close();
                 teamStatement.close();
             } catch (SQLException sqle) {
+                // Annars fixar vi från det laget som redan är inlagt.
                 PreparedStatement teamStatement = con.prepareStatement("SELECT team_id FROM team WHERE name = ?");
                 teamStatement.setString(1, t.getName());
                 t.setId(getReturnedId(teamStatement.executeQuery()));
@@ -218,20 +226,28 @@ public class LeagueDAO {
         matchesStatement.executeBatch();
         matchesStatement.close();
     }
-    
+
     public void uploadMatchResult(Match match) throws SQLException {
         PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
         stmnt.setInt(1, match.getId());
         stmnt.setInt(2, match.getHomeScore());
         stmnt.setInt(3, match.getAwayScore());
-        stmnt.executeUpdate();
+        stmnt.execute();
+        stmnt.close();
+    }
+
+    public void uploadMatchResults(ArrayList<Match> matches) throws SQLException {
+        PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
+        prepareMatchResultsInsert(stmnt, matches);
+        stmnt.executeBatch();
         stmnt.close();
     }
     
-    public void uploadMatchResults(ArrayList<Match> matches) throws SQLException {
-        PreparedStatement stmnt = con.prepareStatement("INSERT INTO match_result (match_id, score_home, score_away) VALUES (?, ?, ?)");
-        prepareMatchResults(stmnt, matches);
-        stmnt.executeBatch();
+    public void removeAllResults(int teamId, int leagueId) throws SQLException  {
+        CallableStatement stmnt = con.prepareCall("{ call p_delete_match_results_for_team(?, ?) }");
+        stmnt.setInt(1, teamId);
+        stmnt.setInt(2, leagueId);
+        stmnt.executeUpdate();
         stmnt.close();
     }
 
@@ -275,7 +291,7 @@ public class LeagueDAO {
         }
     }
 
-    private void prepareMatchResults(PreparedStatement stmt, ArrayList<Match> matches) throws SQLException {
+    private void prepareMatchResultsInsert(PreparedStatement stmt, ArrayList<Match> matches) throws SQLException {
         for (Match match : matches) {
             stmt.setInt(1, match.getId());
             stmt.setInt(2, match.getHomeScore());

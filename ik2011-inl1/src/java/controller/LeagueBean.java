@@ -55,7 +55,7 @@ public class LeagueBean implements Serializable {
 
         if (leagues == null) {
             try {
-                LeagueDAO dao = LeagueDAO.getInstance();
+                LeagueDAO dao = new LeagueDAO();
                 dao.connect();
                 ArrayList<League> lgs = dao.getAllLeagues();
                 dao.disconnect();
@@ -71,6 +71,9 @@ public class LeagueBean implements Serializable {
             } catch (SQLException sqle) {
                 Message.outputMessage(Message.ERROR_UNKNOWN);
                 return null;
+            } catch (Exception e) {
+                Message.outputMessage(e.getMessage());
+                return null;
             }
         } else {
             return leagues;
@@ -84,7 +87,7 @@ public class LeagueBean implements Serializable {
         }
 
         try {
-            LeagueDAO dao = LeagueDAO.getInstance();
+            LeagueDAO dao = new LeagueDAO();
 
             dao.connect();
             ArrayList<Match> matches = dao.getMatchesForLeague(selectedLeague);

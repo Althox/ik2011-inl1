@@ -61,9 +61,15 @@
                                             </h:outputText>
                                         </h:column>
                                         <h:column>
-                                            <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#{adminBean.setMatchToUpdate(matches)}"  value="Rapportera resultat" look="primary" size="xs" />
+                                            <b:commandButton rendered="#{adminBean.isMatchReportable(matches)}" action="#{adminBean.setMatchToUpdate(matches)}"  value="Rapportera resultat" look="success" size="xs" />
                                         </h:column>
                                     </h:dataTable>
+                                    <h:form rendered="#{debugMode.enabled}">
+                                        <b:commandButton action="#{adminBean.removeAllResults(user.associatedTeam.id)}" value="[DEBUG] Ta bort alla resultat" />
+                                        #{" "}
+                                        <b:commandButton action="#{userBean.giveTeamInSeveralLeagues(user, adminBean)}" value="[DEBUG] Ge mig ett lag som finns i flera ligor" />
+                                    </h:form>
+
                                 </h:form>
                             </b:panel>
                         </b:row>
@@ -87,13 +93,13 @@
                                                     <h:outputText value="#{adminBean.getMatchToUpdate().home.name}" />
                                                 </td>
                                                 <td>
-                                                    <b:inputText placeholder="Mål" binding="#{homeScore}" />
+                                                    <b:inputText id="reportHomeScoreField" placeholder="Antal mål" binding="#{homeScore}" />
                                                 </td>
                                                 <td>
                                                     <h:outputText value=" - " />
                                                 </td>
                                                 <td>
-                                                    <b:inputText placeholder="Mål" binding="#{awayScore}" />
+                                                    <b:inputText id="reportAwayScoreField" placeholder="Antal mål" binding="#{awayScore}" />
                                                 </td>
                                                 <td>
                                                     <h:outputText value="#{adminBean.getMatchToUpdate().away.name}" />
@@ -102,7 +108,7 @@
                                         </table>
 
                                         <f:facet name="footer">
-                                            <b:commandButton action="#{adminBean.reportScores(adminBean.getMatchToUpdate(), homeScore.value, awayScore.value)}" look="success" value="Rapportera" />
+                                            <b:commandButton action="#{adminBean.reportScores(adminBean.getMatchToUpdate(), homeScore.value, awayScore.value)}" look="success" value="Rapportera" oncomplete="clearMatchResultFields()" />
                                             #{" "}
                                             <b:commandButton action="#{adminBean.setMatchToUpdate(null)}" look="danger" value="Avbryt" />
                                         </f:facet>

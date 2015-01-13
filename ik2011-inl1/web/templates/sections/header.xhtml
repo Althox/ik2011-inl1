@@ -10,7 +10,7 @@
     </h:head>
     <h:body>
         <ui:composition>
-            <b:navBar brand="LigaSystem" brandHref="./" inverse="true" static="true">
+            <b:navBar brand="LigaSystem" brandHref="#{request.contextPath}/index.xhtml" inverse="true" static="true">
                 <b:navbarLinks pull="right">
                     <h:form styleClass="navbar-form navbar-right" rendered="#{not userBean.loggedIn}">
                         <div class="form-group">
@@ -33,8 +33,8 @@
                     </h:form>
 
                     <b:dropMenu value="Mina Sidor" rendered="#{userBean.loggedIn}">
-                        <b:navLink value="Administrera Lag" href="./User/admin.xhtml" rendered="#{not empty user.associatedTeam}" />
-                        <b:navLink value="Ändra lösenord" href="./User/changepassword.xhtml" />
+                        <b:navLink value="Administrera Lag" href="/User/admin.xhtml" rendered="#{not empty user.associatedTeam}" />
+                        <b:navLink value="Ändra lösenord" href="/User/changepassword.xhtml" />
                     </b:dropMenu>
                 </b:navbarLinks>
             </b:navBar>

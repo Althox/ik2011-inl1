@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import javax.inject.Named;
 import javax.servlet.http.HttpSession;
 import javax.enterprise.context.SessionScoped;
+import javax.inject.Inject;
 import messages.Message;
 import utils.Sessions;
 
@@ -75,11 +76,12 @@ public class UserBean implements Serializable {
                 if(dao.changePassword(user, oldPass, newPass)) {
                     Message.outputMessage(Message.SUCCESS_PASSWORD_CHANGED);
                     return "";
-                }
-                else
+                } else {
                     Message.outputMessage(Message.ERROR_PASSWORD_INCORRECT);
+                    return "";
+                }
             } catch(SQLException sqle) {
-                Message.outputMessage(Message.ERROR_UNKNOWN);
+                Message.outputMessage(sqle.getMessage());
                 return "";
             }
         } else {
@@ -91,5 +93,18 @@ public class UserBean implements Serializable {
     
     public boolean hasAssociatedTeam(User user) {
         return user.getAssociatedTeam() != null;
+    }
+    
+    public String giveTeamInSeveralLeagues(User user, AdminBean bean) {
+        
+        try {
+            UserDAO dao = UserDAO.getInstance();
+            dao.giveTeamInSeveralLeagues(user);
+            bean.selectLeague(-1);
+        } catch (SQLException ex) {
+            Message.outputMessage(ex.getMessage());
+        }
+        
+        return "";
     }
 }

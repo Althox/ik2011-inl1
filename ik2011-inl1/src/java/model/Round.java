@@ -15,16 +15,21 @@ import java.util.ArrayList;
 public class Round {
     private final int totalMatchups;
     private final ArrayList<Match> matches;
+
+    public Round() {
+        this.totalMatchups = -1; // Efectively ignores this parameter.
+        this.matches = new ArrayList();
+    }
     
     public Round(int totalMatchups) {
         this.totalMatchups = totalMatchups;
         matches = new ArrayList<>(totalMatchups);
     }
     
-    public boolean addMatch(Match match) throws RoundFullException {
+    public boolean addMatch(Match match){
         
-        if (isFull())
-            throw new RoundFullException("Round is full. Create a new one.");
+        /*if (isFull())
+            throw new RoundFullException("Round is full. Create a new one.");*/
         
         matches.add(match);
         return true;
@@ -43,8 +48,11 @@ public class Round {
     public boolean containsTeam(Team team) {
         boolean found = false;
         for (int i = 0; i < matches.size(); i++) {
-            found = matches.get(i).getAway().getName().equals(team.getName()) ||
-                    matches.get(i).getHome().getName().equals(team.getName());
+            if (matches.get(i).getAway().getName().equals(team.getName()) ||
+                matches.get(i).getHome().getName().equals(team.getName())) {
+                found = true;
+                break;
+            }
         }
         
         return found;
